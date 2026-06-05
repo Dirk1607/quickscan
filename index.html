@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metroplan Quick Scan — The Next Level</title>
+<meta name="description" content="Hoe gezond is uw organisatie écht? Doe de gratis Metroplan Quick Scan van The Next Level en ontdek uw groeikansen in 10 minuten.">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --dark:#1A2E4A;--mid:#2E5FA3;--light:#D6E4F7;
+  --red-bg:#FADADD;--red-txt:#993C1D;--red-bar:#D85A30;
+  --ora-bg:#FFE8CC;--ora-txt:#854F0B;--ora-bar:#EF9F27;
+  --grn-bg:#D4EDDA;--grn-txt:#085041;--grn-bar:#1D9E75;
+  --blu-bg:#D6E4F7;--blu-txt:#0C447C;--blu-bar:#378ADD;
+  --border:#e2e8f0;--surface:#f8fafc;--text:#1e293b;--muted:#64748b;
+  --radius:10px;--radius-lg:14px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0f4f8;color:var(--text);min-height:100vh;padding:24px 16px}
+.container{max-width:640px;margin:0 auto}
+.card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border);padding:28px;margin-bottom:16px}
+/* HEADER */
+.site-header{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+.logo{width:48px;height:48px;background:var(--dark);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo span{color:#fff;font-size:9px;font-weight:700;letter-spacing:.4px;line-height:1.4;text-align:center}
+.site-title{font-size:20px;font-weight:700;color:var(--dark)}
+.site-sub{font-size:13px;color:var(--muted);margin-top:2px}
+/* PROGRESS */
+.progress-wrap{margin-bottom:24px}
+.progress-track{height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:var(--dark);border-radius:3px;transition:width .5s ease}
+.progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:6px}
+/* STEP */
+.step{display:none}.step.active{display:block}
+/* INTRO */
+.intro-box{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:20px;margin-bottom:20px}
+.intro-box p{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:10px}
+.intro-box p:last-child{margin-bottom:0}
+.scale-legend{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.sl-item{text-align:center;font-size:12px;font-weight:600;padding:8px 4px;border-radius:8px}
+/* FORM */
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.field-group{display:flex;flex-direction:column;gap:5px}
+.field-group label{font-size:13px;font-weight:500;color:var(--text)}
+.field-group input,.field-group select{padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;color:var(--text);background:#fff;transition:border-color .15s}
+.field-group input:focus,.field-group select:focus{outline:none;border-color:var(--dark)}
+/* VRAGEN */
+.blok-label{font-size:11px;font-weight:700;color:var(--dark);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.scale-header{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px;text-align:center}
+.sh-col{font-size:11px;font-weight:600;padding:6px 4px;border-radius:8px}
+.q-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:10px;transition:border-color .2s}
+.q-card.answered{border-color:#c7d2fe}
+.q-num{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px}
+.q-text{font-size:14px;color:var(--text);line-height:1.6;margin-bottom:14px}
+.ans-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ans-btn{padding:10px 6px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);transition:all .15s;text-align:center;line-height:1.3}
+.ans-btn:hover{border-color:var(--dark);color:var(--dark);background:var(--surface)}
+.ans-btn.sel-nooit{background:var(--red-bg);border-color:var(--red-bar);color:var(--red-txt)}
+.ans-btn.sel-zelden{background:var(--ora-bg);border-color:var(--ora-bar);color:var(--ora-txt)}
+.ans-btn.sel-vaak{background:var(--grn-bg);border-color:var(--grn-bar);color:var(--grn-txt)}
+.ans-btn.sel-altijd{background:var(--blu-bg);border-color:var(--blu-bar);color:var(--blu-txt)}
+/* NAVIGATIE */
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:12px}
+.btn{padding:11px 22px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:14px;font-weight:600;color:var(--text);transition:all .15s}
+.btn:hover{background:var(--surface);border-color:#94a3b8}
+.btn-primary{background:var(--dark);color:#fff;border-color:var(--dark)}
+.btn-primary:hover{background:var(--mid);border-color:var(--mid)}
+.q-count{font-size:12px;color:var(--muted)}
+.warn{font-size:13px;color:var(--red-bar);margin-bottom:10px;padding:8px 12px;background:var(--red-bg);border-radius:8px}
+/* RAPPORT */
+.r-hero{background:var(--dark);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;color:#fff}
+.r-hero h1{font-size:20px;font-weight:700;margin-bottom:4px}
+.r-hero p{font-size:13px;opacity:.7}
+.r-section-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;margin-top:24px}
+.r-domain{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px}
+.r-domain-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px}
+.r-name{font-size:14px;font-weight:600;color:var(--text)}
+.r-badge{font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px}
+.badge-r{background:var(--red-bg);color:var(--red-txt)}
+.badge-o{background:var(--ora-bg);color:var(--ora-txt)}
+.badge-g{background:var(--grn-bg);color:var(--grn-txt)}
+.badge-b{background:var(--blu-bg);color:var(--blu-txt)}
+.r-bar-wrap{height:6px;background:#e2e8f0;border-radius:3px;margin-bottom:10px;overflow:hidden}
+.r-bar{height:100%;border-radius:3px}
+.bar-r{background:var(--red-bar)}.bar-o{background:var(--ora-bar)}.bar-g{background:var(--grn-bar)}.bar-b{background:var(--blu-bar)}
+.r-wat{font-size:13px;color:var(--muted);line-height:1.65}
+.r-toggle{font-size:12px;color:var(--mid);cursor:pointer;margin-top:8px;display:inline-flex;align-items:center;gap:4px;font-weight:500}
+.r-toggle:hover{color:var(--dark)}
+.r-extra{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.r-extra-block{margin-bottom:10px}
+.r-extra-block:last-child{margin-bottom:0}
+.r-extra-label{font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.r-extra-txt{font-size:13px;color:var(--muted);line-height:1.6}
+.r-cta{background:var(--dark);border-radius:var(--radius-lg);padding:28px;text-align:center;color:#fff;margin-top:24px}
+.r-cta h2{font-size:18px;font-weight:700;margin-bottom:8px}
+.r-cta p{font-size:13px;opacity:.75;margin-bottom:18px;line-height:1.6}
+.r-cta a{display:inline-block;background:#fff;color:var(--dark);padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;text-decoration:none;transition:opacity .15s}
+.r-cta a:hover{opacity:.85}
+.r-indruk{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:10px;font-size:14px;color:var(--muted);line-height:1.75}
+@media(max-width:520px){
+  .field-row{grid-template-columns:1fr}
+  .ans-row{grid-template-columns:repeat(2,1fr)}
+  .scale-header{grid-template-columns:repeat(2,1fr)}
+  .scale-legend{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="site-header">
+    <div class="logo"><span>The<br>Next<br>Level</span></div>
+    <div>
+      <div class="site-title">Metroplan Quick Scan</div>
+      <div class="site-sub">Hoe gezond is uw organisatie écht? — 10 minuten, eerlijk antwoord.</div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+    <div class="progress-label"><span id="prog-label">Stap 1 van 7</span><span id="prog-pct">0%</span></div>
+  </div>
+
+  <!-- STAP 0: Intro -->
+  <div class="step active" id="step-0">
+    <div class="card">
+      <div class="intro-box">
+        <p>Deze gratis Quick Scan brengt in kaart hoe uw organisatie scoort op de <strong>11 metrolijnen</strong> en <strong>5 organisatieversnellers</strong> van The Next Level. U beantwoordt 30 uitspraken en ontvangt daarna een gepersonaliseerd rapport.</p>
+        <p>Beantwoord elke uitspraak zo eerlijk mogelijk. Er zijn geen goede of foute antwoorden — enkel uw werkelijke situatie telt.</p>
+        <p>Hoe vaak is de uitspraak van toepassing op uw organisatie?</p>
+        <div class="scale-legend">
+          <div class="sl-item" style="background:var(--red-bg);color:var(--red-txt)">Nooit</div>
+          <div class="sl-item" style="background:var(--ora-bg);color:var(--ora-txt)">Zelden</div>
+          <div class="sl-item" style="background:var(--grn-bg);color:var(--grn-txt)">Vaak</div>
+          <div class="sl-item" style="background:var(--blu-bg);color:var(--blu-txt)">Altijd</div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group"><label>Voornaam &amp; naam *</label><input id="f-naam" type="text" placeholder="Jan Janssen"></div>
+        <div class="field-group"><label>Bedrijf *</label><input id="f-bedrijf" type="text" placeholder="Uw bedrijf bv."></div>
+      </div>
+      <div class="field-row">
+        <div class="field-group"><label>E-mailadres *</label><input id="f-email" type="email" placeholder="jan@bedrijf.be"></div>
+        <div class="field-group"><label>Functie</label><input id="f-functie" type="text" placeholder="Zaakvoerder / CEO / ..."></div>
+      </div>
+      <div class="field-row">
+        <div class="field-group"><label>Aantal medewerkers</label>
+          <select id="f-mw"><option value="">Kies...</option><option>1–10</option><option>11–25</option><option>26–50</option><option>51–100</option><option>100+</option></select>
+        </div>
+        <div class="field-group"><label>Sector</label>
+          <select id="f-sector"><option value="">Kies...</option><option>Productie / Industrie</option><option>Bouw / Technische diensten</option><option>Handel / Retail</option><option>Diensten / Consultancy</option><option>Zorgsector</option><option>IT / Technologie</option><option>Andere</option></select>
+        </div>
+      </div>
+      <div id="warn-intro" class="warn" style="display:none">Vul naam, bedrijf en e-mailadres in om verder te gaan.</div>
+      <div class="nav-row">
+        <span style="font-size:13px;color:var(--muted)">Uw gegevens worden vertrouwelijk behandeld.</span>
+        <button class="btn btn-primary" onclick="startScan()">Start de Quick Scan &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vragenblokken 1-6 -->
+  <div class="step" id="step-1"></div>
+  <div class="step" id="step-2"></div>
+  <div class="step" id="step-3"></div>
+  <div class="step" id="step-4"></div>
+  <div class="step" id="step-5"></div>
+  <div class="step" id="step-6"></div>
+
+  <!-- Rapport -->
+  <div class="step" id="step-7"><div id="rapport-content"></div></div>
+
+</div><!-- /container -->
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const VRAGEN=[
+  {t:"Het bedrijf is té afhankelijk van enkele sleutelfiguren en te veel vragen komen bij dezelfde mensen terecht.",d:["HR","OPS","OWN"],inv:true},
+  {t:"Ik vaar blind als het over marges, cash of rendabiliteit gaat.",d:["FIN","STR"],inv:true},
+  {t:"Ons bedrijf voelt als een kaartenhuisje waar niemand nog veel kan bijnemen.",d:["OPS","HR","PROC"],inv:true},
+  {t:"Problemen tussen afdelingen kosten ons meer energie dan we zouden willen.",d:["OPS","HR","LEAD"],inv:true},
+  {t:"Veranderingsinitiatieven worden omgezet naar projecten.",d:["PM","CHG","PROC"],inv:false},
+  {t:"Verbeterprojecten worden bij ons afgewerkt binnen de deadline en budget.",d:["PM","OPS","CHG"],inv:false},
+  {t:"Nieuwe medewerkers vinden snel hun weg om te begrijpen hoe systemen, processen en klantenwerking in elkaar zitten.",d:["PROC","HR","IT"],inv:false},
+  {t:"Onze leidinggevenden krijgen mensen mee zonder constant te moeten duwen.",d:["LEAD","HR","CHG"],inv:false},
+  {t:"Mensen weten duidelijk wat van hen verwacht wordt en aan wie zij rapporteren.",d:["HR","PROC","OWN"],inv:false},
+  {t:"We zijn brandjes aan het blussen in plaats van de oorzaak aan te pakken.",d:["OPS","STR","PROC"],inv:true},
+  {t:"We verliezen klanten door interne chaos, opvolgingsproblemen of gebrekkige communicatie.",d:["AFS","OPS","QUA"],inv:true},
+  {t:"We weten precies welke klanten, producten, diensten of marktsegmenten geld opbrengen.",d:["FIN","SAL","MKT"],inv:false},
+  {t:"Wanneer we snel cijfers, klantinformatie of operationele data nodig hebben, vinden we die zonder veel zoekwerk.",d:["IT","FIN","PROC"],inv:false},
+  {t:"Beslissingen worden effectief uitgevoerd.",d:["PM","LEAD","OWN"],inv:false},
+  {t:"We moeten lastminute oplossingen bedenken of werk opnieuw uitvoeren om klanten, projecten of leveringen correct af te werken.",d:["QUA","OPS","PROC"],inv:true},
+  {t:"We slagen erin om de juiste medewerkers aan te trekken én te behouden.",d:["HR","STR","LEAD"],inv:false},
+  {t:"Mensen durven zeggen wanneer iets niet werkt.",d:["LEAD","HR","CHG"],inv:false},
+  {t:"We moeten controleren om dingen correct te laten verlopen.",d:["QUA","PROC","OWN"],inv:true},
+  {t:"We slagen erin om verantwoordelijkheden en beslissingen laag in de organisatie te leggen.",d:["OWN","HR","LEAD"],inv:false},
+  {t:"We verliezen energie en tijd aan interne discussies over prioriteiten en beslissingen.",d:["STR","LEAD","PM"],inv:true},
+  {t:"We kunnen snel schakelen wanneer klanten, technologie of de markt veranderen.",d:["PROD","STR","IT"],inv:false},
+  {t:"Het is voor onze medewerkers duidelijk waar het bedrijf naartoe wil.",d:["STR","HR","LEAD"],inv:false},
+  {t:"Onze commerciële opportuniteiten ontstaan via toeval of enkele vaste klanten.",d:["SAL","MKT","STR"],inv:true},
+  {t:"Iedereen volgt de procedures, systemen en klantaanpak.",d:["PROC","IT","QUA"],inv:false},
+  {t:"We worden verrast door problemen, incidenten of risico's die we hadden kunnen zien aankomen.",d:["SAF","QUA","OWN"],inv:true},
+  {t:"Veiligheid, kwaliteit en duidelijke afspraken worden bewaakt vóór er problemen ontstaan.",d:["SAF","QUA","PROC"],inv:false},
+  {t:"Meer mensen in dienst hebben vergroot de complexiteit in ons bedrijf.",d:["HR","OPS","LEAD"],inv:true},
+  {t:"Ons managementteam trekt in dezelfde richting en heeft een gedeeld beeld van waar het bedrijf naartoe wil.",d:["STR","LEAD","CHG"],inv:false},
+  {t:"Te veel beslissingen en vragen komen uiteindelijk nog bij de directie terecht, ook wanneer anderen ze zouden kunnen opnemen.",d:["OWN","LEAD","HR"],inv:true},
+  {t:"We weten precies waar in het bedrijf geld verloren gaat.",d:["FIN","OPS","PROC"],inv:false}
+];
+
+const DOMAINS={
+  STR:"Strategie",PROD:"Product / R&D",MKT:"Marketing",SAL:"Sales",
+  OPS:"Operations",AFS:"After Sales",HR:"HR",FIN:"Finance",
+  IT:"IT",QUA:"Kwaliteit",SAF:"Veiligheid",
+  PM:"Project Management",PROC:"Proces Management",LEAD:"Leiderschap",
+  CHG:"Change Management",OWN:"Eigenaarschap"
+};
+
+const LIJNEN=["STR","PROD","MKT","SAL","OPS","AFS","HR","FIN","IT","QUA","SAF"];
+const VERSNELLERS=["PM","PROC","LEAD","CHG","OWN"];
+
+const BLOKKEN=[
+  "Organisatie & Mensen",
+  "Sturing & Processen",
+  "Leiderschap & Resultaat",
+  "Klant & Commercieel",
+  "Veiligheid & Kwaliteit",
+  "Strategie & Richting"
+];
+
+const PROFIEL={
+  STR:{
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"De organisatie werkt zonder een duidelijke strategische koers. Beslissingen worden ad hoc genomen en prioriteiten verschuiven voortdurend.",herk:"Het managementteam heeft geen gedeeld beeld van waar het bedrijf naartoe wil. Vergaderingen eindigen zonder duidelijke conclusies.",impact:"Zonder strategische richting worden energie en middelen versnipperd. Groei verloopt toevallig in plaats van doelgericht.",nieuws:"Bedrijven die een heldere strategische lijn uitzetten ervaren snel meer rust en een betere afstemming.",visie:"Vaak volstaan drie heldere prioriteiten voor het komende jaar om iedereen in dezelfde richting te laten werken."},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er zijn strategische intenties, maar ze zijn onvoldoende geconcretiseerd of gecommuniceerd.",herk:"De zaakvoerder weet waar het bedrijf naartoe wil, maar het middenmanagement werkt nog te veel vanuit eigen inzichten.",impact:"Strategische plannen die niet landen op de werkvloer creëren een kloof tussen intentie en uitvoering.",nieuws:"Met enkele gerichte stappen kan de organisatie de strategische lijn snel beter verankeren.",visie:"Strategie wordt pas krachtig als ze begrepen én gedragen wordt door iedereen die ze uitvoert."},
+    3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"De organisatie beschikt over een heldere strategische richting die voldoende bekend is bij het managementteam.",herk:"Er zijn jaarlijkse plannen, KPI's zijn gekend en het team werkt grotendeels in dezelfde richting.",impact:"Het risico zit in het vasthouden van focus wanneer de dagelijkse operatie druk zet op de strategische agenda.",nieuws:"Een iets strakker opvolgingsritme houdt de richting ook bij drukte zichtbaar.",visie:"Bedrijven in deze zone hebben het fundament. De volgende stap is het verhogen van de strategische veerkracht."},
+    4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"De strategische lijn is helder, gedragen en vertaald naar concrete doelen op alle niveaus.",herk:"Strategische plannen worden jaarlijks bijgesteld, gevolgd via indicatoren en gecommuniceerd doorheen de organisatie.",impact:"Een sterke strategische basis laat toe sneller te beslissen en meer rendement te halen uit groei-investeringen.",nieuws:"De uitdaging is het bewaken van de strategische wendbaarheid bij marktverandering.",visie:"Dit is een stevige troef. Investeer in het onderhouden van die strategische scherpte."}
+  },
+  OPS:{
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"De dagelijkse werking is reactief. Brandjes blussen is de norm en dezelfde problemen keren telkens terug.",herk:"Planning is rudimentair en de uitvoering hangt af van de kennis van enkele sleutelfiguren.",impact:"Operationele chaos kost geld, tijd en energie. Herwerk en laattijdige leveringen zijn directe gevolgen.",nieuws:"Bedrijven die een basisstructuur invoeren ervaren snel minder brandjes en meer rust.",visie:"Structuur begint klein: wie doet wat, wanneer, en hoe weten we of het goed gaat?"},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er zijn operationele afspraken, maar ze worden niet consistent nageleefd.",herk:"Er zijn processen op papier, maar in de praktijk werkt iedereen op zijn eigen manier.",impact:"Inconsistente operations leiden tot variabele kwaliteit en minder voorspelbare resultaten.",nieuws:"Door processen te verduidelijken en consequent na te leven kan de consistentie snel verbeteren.",visie:"De kennis is aanwezig. Structureer ze zodat ze niet afhangt van individuen."},
+    3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"De operationele werking is redelijk gestructureerd en processen worden voldoende nageleefd.",herk:"Planning en uitvoering verlopen grotendeels vlot. Er is een zekere voorspelbaarheid.",impact:"Het risico zit in het verwaarlozen van continue verbetering bij drukte of groei.",nieuws:"Een systematische verbetercyclus houdt de kwaliteit op peil bij verdere groei.",visie:"Stevige basis. De volgende stap is continue verbetering als vaste gewoonte."},
+    4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Operations zijn professioneel ingericht, voorspelbaar en continu verbeterend.",herk:"Planning, uitvoering en opvolging verlopen systematisch. Problemen worden proactief geïdentificeerd.",impact:"Excellente operations zijn een duurzaam concurrentievoordeel: lagere kosten, hogere kwaliteit.",nieuws:"De uitdaging is operationele excellentie bewaken bij schaalvergroting.",visie:"Sterke troef. Blijf investeren in verbetering ook bij verdere groei."}
+  },
+  HR:{
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"HR is nauwelijks gestructureerd. Rollen zijn onduidelijk en medewerkersbehoud is een voortdurend probleem.",herk:"Functiebeschrijvingen ontbreken. Nieuwe medewerkers vinden moeilijk hun weg. Vertrek van sleutelfiguren zorgt voor grote verstoringen.",impact:"Zwakke HR-structuur leidt tot hoge verloopkosten en een organisatie die moeilijk schaalbaar is.",nieuws:"Een basisstructuur voor HR kan snel een merkbaar verschil maken in rust en retentie.",visie:"De mensen zijn het grootste kapitaal van elke KMO."},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er zijn HR-processen, maar ze zijn niet consistent of volledig uitgewerkt.",herk:"Gesprekken met medewerkers zijn niet systematisch. Functieverwachtingen zijn niet altijd helder.",impact:"Inconsistente HR leidt tot onduidelijkheid bij medewerkers en hogere verloopkosten.",nieuws:"Door HR-processen te verduidelijken kan de medewerkerstevredenheid snel verbeteren.",visie:"De wil is aanwezig. Wat ontbreekt is een consistent HR-ritme."},
+    3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"HR is voldoende gestructureerd. Rollen zijn duidelijk en evaluatiegesprekken vinden regelmatig plaats.",herk:"Aanwerving verloopt gestructureerd. Medewerkers weten wat van hen verwacht wordt.",impact:"Het risico zit in het verwaarlozen van talentontwikkeling bij verdere groei.",nieuws:"Gerichte ontwikkeltrajecten kunnen de HR-kwaliteit verder versterken.",visie:"Stevige basis. Bouw aan een organisatie die mensen aantrekt én houdt."},
+    4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"HR is professioneel ingericht. Medewerkers zijn duidelijk in hun rol en worden goed begeleid.",herk:"Aanwerving, onboarding, evaluatie en ontwikkeling verlopen systematisch.",impact:"Sterke HR is een strategisch voordeel: de juiste mensen op de juiste plaats.",nieuws:"De uitdaging is de HR-kwaliteit bewaken bij verdere groei.",visie:"Mensen zijn het fundament — en dit bedrijf heeft dat begrepen."}
+  },
+  FIN:{
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Financieel inzicht is beperkt. Er is onvoldoende zicht op marges, cash of rendabiliteit.",herk:"Resultaten zijn pas bekend via de jaarrekening, maanden te laat. Beslissingen zonder financiële onderbouwing.",impact:"Zonder financieel inzicht is bijsturen onmogelijk. Het risico is groeien naar verlies zonder het te beseffen.",nieuws:"Zelfs een eenvoudig maandelijks dashboard geeft al veel meer grip.",visie:"Financieel inzicht is geen luxe. Een maandrapportering is al een enorme stap."},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is enige rapportering, maar ze is onvolledig of te laat beschikbaar.",herk:"De cijfers zijn er, maar worden niet goed geïnterpreteerd voor bijsturing.",impact:"Onvoldoende financieel inzicht leidt tot suboptimale beslissingen over prijszetting en groei.",nieuws:"Door bestaande data beter te structureren kan de besluitvorming snel verbeteren.",visie:"De data is beschikbaar. Wat ontbreekt is de juiste interpretatie."},
+    3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"Financiële rapportering is aanwezig en voldoende tijdig beschikbaar.",herk:"Maandelijkse rapportering is beschikbaar. Marges zijn gekend per activiteit.",impact:"Goed financieel inzicht ondersteunt betere beslissingen en verhoogt de bedrijfswaarde.",nieuws:"Diepere segmentanalyse kan de kwaliteit van beslissingen verder verhogen.",visie:"Solide basis. Verfijn het instrumentarium om proactief te sturen."},
+    4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Financieel management is professioneel. Real-time inzicht in marges, cash en rendabiliteit.",herk:"Maandelijkse closing, cashflow forecasting en segmentanalyse zijn ingeburgerd.",impact:"Sterke financiële sturing verlaagt risico's en maakt het bedrijf aantrekkelijker voor investeerders.",nieuws:"De uitdaging is het instrumentarium up-to-date houden bij groei.",visie:"Finance als stuurinstrument is een van de grootste hefbomen voor waardecreatie."}
+  },
+  LEAD:{
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Leiderschapscapaciteit is beperkt of geconcentreerd bij één persoon.",herk:"Beslissingen blijven bij de top omdat het middenmanagement onvoldoende capabel is. Medewerkers wachten op instructies.",impact:"Zwak leiderschap remt de schaalbaarheid. De zaakvoerder blijft gevangen in operationele beslissingen.",nieuws:"Gerichte leiderschapsontwikkeling kan snel leiden tot meer zelfstandigheid.",visie:"Leiderschap is een vaardigheid die geleerd kan worden."},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is leiderschapspotentieel, maar leidinggevenden zijn onvoldoende gecoacht of ondersteund.",herk:"Leidinggevenden zijn goed in hun technisch domein maar minder sterk in people management.",impact:"Onvoldoende leiderschapskapaciteit leidt tot grote afhankelijkheid van de zaakvoerder.",nieuws:"Gerichte coaching kan de organisatie snel winnen aan zelfstandigheid.",visie:"Het potentieel is er. Gerichte begeleiding maakt het verschil."},
+    3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"Leiderschap is voldoende sterk. Leidinggevenden krijgen mensen mee en communiceren helder.",herk:"Het managementteam functioneert goed. Er is voldoende psychologische veiligheid.",impact:"Goed leiderschap draagt bij aan retentie, motivatie en resultaat.",nieuws:"Leiderschapsontwikkeling op alle niveaus bouwt een strategisch voordeel op.",visie:"Sterke basis. Verankeren en vermenigvuldigen is de volgende stap."},
+    4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Leiderschap is een organisatiecompetentie op alle niveaus.",herk:"Er is een leiderschapscultuur die medewerkers aanmoedigt verantwoordelijkheid te nemen.",impact:"Sterk leiderschap vergroot het veranderingsvermogen, de retentie en het innovatievermogen.",nieuws:"De uitdaging is de leiderschapscultuur bewaken bij verdere groei.",visie:"Leiderschap als cultuur is het fundament van een duurzame organisatie."}
+  },
+  OWN:{
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Verantwoordelijkheden zijn onduidelijk verdeeld. Te veel beslissingen komen bij de directie terecht.",herk:"Medewerkers wachten op instructies. De zaakvoerder wordt overspoeld door vragen.",impact:"Een organisatie zonder eigenaarschap is moeilijk schaalbaar.",nieuws:"Heldere verantwoordelijkheden maken de organisatie snel zelfstandiger.",visie:"Eigenaarschap vraagt duidelijkheid, vertrouwen en het durven loslaten van controle."},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is enig eigenaarschap, maar het hangt af van individuen.",herk:"Sommige medewerkers nemen initiatief, anderen wachten consequent.",impact:"Inconsistent eigenaarschap leidt tot frustratie en overbelasting van de leiding.",nieuws:"Duidelijke kaders maken eigenaarschap mogelijk en veilig.",visie:"Het potentieel is er. Wat ontbreekt is een helder kader."},
+    3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"Eigenaarschap is voldoende aanwezig. Medewerkers nemen verantwoordelijkheid voor hun domein.",herk:"Er zijn duidelijke verantwoordelijkheden per rol. Beslissingen worden op het juiste niveau genomen.",impact:"Goed eigenaarschap maakt de organisatie schaalbaarder.",nieuws:"Eigenaarschap verder verankeren vergroot autonomie en wendbaarheid.",visie:"Sterke basis. De volgende stap is eigenaarschap ook op strategisch niveau."},
+    4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Eigenaarschap is een organisatiewaarde. Medewerkers nemen beslissingen zonder te wachten.",herk:"Er is een cultuur van initiatief. De zaakvoerder focust op strategie.",impact:"Sterk eigenaarschap is de basis van een schaalbare, wendbare organisatie.",nieuws:"De uitdaging is eigenaarschap bewaken bij verdere groei.",visie:"Een organisatie met sterk eigenaarschap is klaar voor de volgende groeifase."}
+  }
+};
+
+function getFallback(z){
+  const f=[
+    {badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Op dit domein zijn er duidelijke groeikansen die prioritaire aandacht verdienen.",herk:"Bedrijven in deze zone ervaren regelmatig terugkerende problemen op dit vlak.",impact:"Zonder gerichte aanpak kan dit de groei en het rendement significant afremmen.",nieuws:"Gerichte acties leveren op dit domein vaak snel merkbare verbeteringen op.",visie:"Dit is een prioritair aandachtspunt dat we samen graag verder verkennen."},
+    {badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is een basis aanwezig, maar die is nog onvoldoende consistent uitgewerkt.",herk:"Bedrijven in deze zone missen de rode draad om initiatieven duurzaam te verankeren.",impact:"Inconsistentie leidt tot gemiste kansen en hogere operationele kosten.",nieuws:"Met gerichte stappen kan dit domein snel versterkt worden.",visie:"De bouwblokken zijn er. Een heldere structuur maakt het verschil."},
+    {badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"Er is een solide basis aanwezig die voldoende consistent wordt toegepast.",herk:"De organisatie doet het op dit vlak beter dan veel vergelijkbare bedrijven.",impact:"Het risico zit in het verwaarlozen van verdere ontwikkeling bij groei.",nieuws:"Gerichte optimalisatie kan dit domein van goed naar uitstekend brengen.",visie:"Sterke basis. Blijf investeren om dit voordeel te consolideren."},
+    {badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Dit domein is professioneel uitgebouwd en vormt een echte troef.",herk:"De organisatie scoort aantoonbaar beter dan vergelijkbare KMO's.",impact:"Dit is een duurzaam concurrentievoordeel dat moeilijk te kopiëren is.",nieuws:"De uitdaging is dit voordeel te bewaken bij verdere groei.",visie:"Uitstekend. Koester en onderhoud deze competentie."}
+  ];
+  return f[z-1];
+}
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+const rawAns=new Array(30).fill(0);
+const scoreVals=new Array(30).fill(0);
+let currentStep=0;
+
+// ─── BOUW VRAGENBLOKKEN ──────────────────────────────────────────────────────
+function buildBlocks(){
+  for(let b=0;b<6;b++){
+    const el=document.getElementById('step-'+(b+1));
+    const start=b*5;
+    let html=`<div class="card">
+<div class="blok-label">${BLOKKEN[b]}</div>
+<div class="scale-header">
+  <div class="sh-col" style="background:var(--red-bg);color:var(--red-txt)">Nooit</div>
+  <div class="sh-col" style="background:var(--ora-bg);color:var(--ora-txt)">Zelden</div>
+  <div class="sh-col" style="background:var(--grn-bg);color:var(--grn-txt)">Vaak</div>
+  <div class="sh-col" style="background:var(--blu-bg);color:var(--blu-txt)">Altijd</div>
+</div>`;
+    for(let i=start;i<start+5;i++){
+      const v=VRAGEN[i];
+      html+=`<div class="q-card" id="qc-${i}">
+  <div class="q-num">Vraag ${i+1} / 30</div>
+  <div class="q-text">${v.t}</div>
+  <div class="ans-row">
+    <button class="ans-btn" onclick="setAns(${i},1,${v.inv?4:1},this)" data-q="${i}">Nooit</button>
+    <button class="ans-btn" onclick="setAns(${i},2,${v.inv?3:2},this)" data-q="${i}">Zelden</button>
+    <button class="ans-btn" onclick="setAns(${i},3,${v.inv?2:3},this)" data-q="${i}">Vaak</button>
+    <button class="ans-btn" onclick="setAns(${i},4,${v.inv?1:4},this)" data-q="${i}">Altijd</button>
+  </div>
+</div>`;
+    }
+    html+=`<div class="nav-row">
+  <button class="btn" onclick="goStep(${b})">&larr; Terug</button>
+  <span class="q-count">Blok ${b+1} van 6</span>
+  <button class="btn btn-primary" onclick="nextBlock(${b+1})">${b===5?'Bekijk mijn rapport &rarr;':'Volgende &rarr;'}</button>
+</div></div>`;
+    el.innerHTML=html;
+  }
+}
+
+function setAns(qi,raw,sv,btn){
+  rawAns[qi]=raw;
+  scoreVals[qi]=sv;
+  document.querySelectorAll('[data-q="'+qi+'"]').forEach(b=>b.className='ans-btn');
+  const cls=['sel-nooit','sel-zelden','sel-vaak','sel-altijd'][raw-1];
+  btn.className='ans-btn '+cls;
+  const card=document.getElementById('qc-'+qi);
+  if(card)card.classList.add('answered');
+}
+
+function goStep(n){
+  document.getElementById('step-'+currentStep).classList.remove('active');
+  currentStep=n;
+  document.getElementById('step-'+n).classList.add('active');
+  const pct=Math.round(n/7*100);
+  document.getElementById('prog').style.width=pct+'%';
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('prog-label').textContent=n===0?'Introductie':n===7?'Rapport klaar':'Stap '+n+' van 6';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function startScan(){
+  const naam=document.getElementById('f-naam').value.trim();
+  const bedrijf=document.getElementById('f-bedrijf').value.trim();
+  const email=document.getElementById('f-email').value.trim();
+  if(!naam||!bedrijf||!email){document.getElementById('warn-intro').style.display='block';return;}
+  document.getElementById('warn-intro').style.display='none';
+  buildBlocks();
+  goStep(1);
+}
+
+function nextBlock(b){
+  const start=(b-1)*5;
+  for(let i=start;i<start+5;i++){
+    if(!rawAns[i]){
+      alert('Beantwoord alle vragen in dit blok voor u verdergaat.');
+      return;
+    }
+  }
+  if(b===6)buildRapport();
+  goStep(b===6?7:b+1);
+}
+
+// ─── SCORING ─────────────────────────────────────────────────────────────────
+function calcScores(){
+  const tot={},cnt={};
+  Object.keys(DOMAINS).forEach(d=>{tot[d]=0;cnt[d]=0;});
+  VRAGEN.forEach((v,i)=>{
+    if(!scoreVals[i])return;
+    v.d.forEach((d,di)=>{
+      const w=di===0?3:di===1?2:1;
+      tot[d]+=scoreVals[i]*w;
+      cnt[d]+=w;
+    });
+  });
+  const sc={};
+  Object.keys(DOMAINS).forEach(d=>{
+    sc[d]=cnt[d]?Math.round(tot[d]/cnt[d]*10)/10:0;
+  });
+  return sc;
+}
+
+function getZone(s){return s<=1.75?1:s<=2.5?2:s<=3.25?3:4;}
+
+// ─── RAPPORT ─────────────────────────────────────────────────────────────────
+function getProfiel(code,zone){
+  return(PROFIEL[code]&&PROFIEL[code][zone])||getFallback(zone);
+}
+
+function domeinBlock(code,scores){
+  const z=getZone(scores[code]);
+  const p=getProfiel(code,z);
+  const pct=Math.round(scores[code]/4*100);
+  const id='ex-'+code;
+  return `<div class="r-domain">
+  <div class="r-domain-top">
+    <span class="r-name">${DOMAINS[code]}</span>
+    <span class="r-badge ${p.badge}">${p.barlbl}</span>
+  </div>
+  <div class="r-bar-wrap"><div class="r-bar ${p.bar}" style="width:${pct}%"></div></div>
+  <div class="r-wat">${p.wat}</div>
+  <div class="r-toggle" onclick="toggleExtra('${id}',this)">Meer lezen &#8964;</div>
+  <div class="r-extra" id="${id}">
+    <div class="r-extra-block"><div class="r-extra-label">Herkent u dit?</div><div class="r-extra-txt">${p.herk}</div></div>
+    <div class="r-extra-block"><div class="r-extra-label">Mogelijke impact</div><div class="r-extra-txt">${p.impact}</div></div>
+    <div class="r-extra-block"><div class="r-extra-label">Het goede nieuws</div><div class="r-extra-txt">${p.nieuws}</div></div>
+    <div class="r-extra-block"><div class="r-extra-label">TNL-visie</div><div class="r-extra-txt">${p.visie}</div></div>
+  </div>
+</div>`;
+}
+
+function buildRapport(){
+  const naam=document.getElementById('f-naam').value.trim();
+  const bedrijf=document.getElementById('f-bedrijf').value.trim();
+  const scores=calcScores();
+  const zwak=Object.keys(scores).sort((a,b)=>scores[a]-scores[b]).slice(0,3);
+  const gem=Math.round(Object.values(scores).reduce((a,b)=>a+b,0)/Object.values(scores).length*10)/10;
+  const gz=getZone(gem);
+  const gt=gz<=2
+    ?"Uw organisatie beschikt over duidelijke ambitie en vakkennis, maar de interne structuur heeft op meerdere vlakken groeikansen. De werking loopt op verschillende domeinen nog te veel via individuen en ad hoc-beslissingen. Dat is een herkenbaar patroon bij groeibedrijven — en het is oplosbaar."
+    :gz===3
+    ?"Uw organisatie heeft een degelijke basis op de meeste vlakken. Er zijn echter domeinen waar gerichte verbetering snel extra rendement, rust en groeicapaciteit kan opleveren. De fundamenten zijn aanwezig — nu is het zaak om gericht te versterken waar het meeste verschil te maken valt."
+    :"Uw organisatie is professioneel uitgebouwd op de meeste vlakken en beschikt over sterke troeven die u onderscheiden van de meeste KMO's in uw sector. Het is nu zaak die troeven te bewaken bij verdere groei en de resterende groeikansen gericht aan te pakken.";
+
+  document.getElementById('rapport-content').innerHTML=`
+<div class="r-hero">
+  <h1>Metroplan Quick Scan</h1>
+  <p>${bedrijf} &nbsp;&middot;&nbsp; ${naam} &nbsp;&middot;&nbsp; The Next Level</p>
+</div>
+<div class="r-section-title">Onze eerste indruk</div>
+<div class="r-indruk">${gt}</div>
+<div class="r-section-title">De 11 metrolijnen</div>
+${LIJNEN.map(c=>domeinBlock(c,scores)).join('')}
+<div class="r-section-title">De 5 organisatieversnellers</div>
+${VERSNELLERS.map(c=>domeinBlock(c,scores)).join('')}
+<div class="r-section-title">Onze eerste aanbevelingen</div>
+<div class="r-indruk">Op basis van uw antwoorden zien we de grootste groeikansen op onderstaande domeinen. Dit zijn de domeinen met de meeste hefboomwerking voor uw specifieke situatie — niet noodzakelijk de laagste scores, maar de meest impactvolle verbeterpunten.</div>
+${zwak.map(code=>{
+  const z=getZone(scores[code]);
+  const p=getProfiel(code,z);
+  return `<div class="r-domain">
+  <div class="r-domain-top"><span class="r-name">${DOMAINS[code]}</span><span class="r-badge ${p.badge}">${p.barlbl}</span></div>
+  <div class="r-bar-wrap"><div class="r-bar ${p.bar}" style="width:${Math.round(scores[code]/4*100)}%"></div></div>
+  <div class="r-wat">${p.visie}</div>
+</div>`;
+}).join('')}
+<div class="r-cta">
+  <h2>Klaar om de volgende stap te zetten?</h2>
+  <p>In een gratis gesprek van 30 minuten bespreken we uw resultaten en de meest concrete volgende stap voor uw bedrijf. Geen verplichtingen, wél direct inzicht.</p>
+  <a href="mailto:dirk@thenextlevel.be?subject=Quick%20Scan%20bespreken%20-%20${encodeURIComponent(bedrijf)}&body=Beste%20Dirk%2C%0A%0AIk%20heb%20de%20Metroplan%20Quick%20Scan%20ingevuld%20en%20wil%20graag%20de%20resultaten%20bespreken.%0A%0ANaam%3A%20${encodeURIComponent(naam)}%0ABedrijf%3A%20${encodeURIComponent(bedrijf)}%0A%0AMet%20vriendelijke%20groeten">Plan een gratis gesprek &rarr;</a>
+</div>`;
+}
+
+function toggleExtra(id,el){
+  const ex=document.getElementById(id);
+  if(ex.style.display==='block'){ex.style.display='none';el.innerHTML='Meer lezen &#8964;';}
+  else{ex.style.display='block';el.innerHTML='Minder &#8963;';}
+}
+</script>
+</body>
+</html>

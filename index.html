@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Metroplan Quick Scan — The Next Level</title>
 <meta name="description" content="Hoe gezond is uw organisatie écht? Doe de gratis Metroplan Quick Scan van The Next Level en ontdek uw groeikansen in 10 minuten.">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/build/index.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -23,6 +24,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .site-header{display:flex;align-items:center;gap:14px;margin-bottom:28px}
 .logo{width:48px;height:48px;background:var(--dark);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .logo span{color:#fff;font-size:9px;font-weight:700;letter-spacing:.4px;line-height:1.4;text-align:center}
+.logo img{width:100%;height:100%;object-fit:cover;border-radius:8px}
 .site-title{font-size:20px;font-weight:700;color:var(--dark)}
 .site-sub{font-size:13px;color:var(--muted);margin-top:2px}
 /* PROGRESS */
@@ -97,11 +99,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .r-cta a{display:inline-block;background:#fff;color:var(--dark);padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;text-decoration:none;transition:opacity .15s}
 .r-cta a:hover{opacity:.85}
 .r-indruk{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:10px;font-size:14px;color:var(--muted);line-height:1.75}
+/* METRO MAP */
+.metro-map{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;position:relative;overflow:auto;min-height:300px}
+.metro-svg{max-width:100%;height:auto}
+/* NOTIFICATION */
+.notification{position:fixed;bottom:20px;right:20px;background:#1D9E75;color:#fff;padding:16px 20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:9999;max-width:300px;animation:slideIn .3s ease}
+.notification.error{background:#D85A30}
+@keyframes slideIn{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}
+.metro-map{min-height:220px}
 @media(max-width:520px){
+  .container{padding:12px}
+  .card{padding:16px}
+  .r-hero{padding:18px}
+  .r-hero h1{font-size:18px}
+  .r-cta{padding:18px}
   .field-row{grid-template-columns:1fr}
   .ans-row{grid-template-columns:repeat(2,1fr)}
   .scale-header{grid-template-columns:repeat(2,1fr)}
   .scale-legend{grid-template-columns:repeat(2,1fr)}
+  .metro-map{min-height:200px;padding:12px}
+  .r-cta a{padding:10px 18px}
 }
 </style>
 </head>
@@ -110,7 +127,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
   <!-- HEADER -->
   <div class="site-header">
-    <div class="logo"><span>The<br>Next<br>Level</span></div>
+    <div class="logo" id="tnl-logo">
+      <svg viewBox="0 0 48 48" width="48" height="48" xmlns="http://www.w3.org/2000/svg">
+        <!-- Background -->
+        <circle cx="24" cy="24" r="24" fill="#1A2E4A"/>
+        <!-- Metro lines forming TNL -->
+        <g stroke="#FF6B35" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <!-- T - vertical line and horizontal line -->
+          <line x1="8" y1="10" x2="16" y2="10"/>
+          <line x1="12" y1="10" x2="12" y2="20"/>
+          <!-- N - diagonal forming connection -->
+          <polyline points="20,10 20,20 28,10 28,20"/>
+          <!-- L - vertical and horizontal -->
+          <polyline points="32,10 32,20 40,20"/>
+        </g>
+        <!-- Metro dots -->
+        <circle cx="12" cy="24" r="1.5" fill="#FF6B35"/>
+        <circle cx="24" cy="32" r="1.5" fill="#FF6B35"/>
+        <circle cx="36" cy="24" r="1.5" fill="#FF6B35"/>
+      </svg>
+    </div>
     <div>
       <div class="site-title">Metroplan Quick Scan</div>
       <div class="site-sub">Hoe gezond is uw organisatie écht? — 10 minuten, eerlijk antwoord.</div>
@@ -175,6 +211,179 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </div><!-- /container -->
 
 <script>
+// ─── EMAIL.JS INITIALIZATION ────────────────────────────────────────────────
+(function(){
+  try{
+    emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // Replace with your EmailJS public key
+  }catch(e){
+    console.log("EmailJS not initialized - email features disabled");
+  }
+})();
+
+// ─── NOTIFICATION SYSTEM ────────────────────────────────────────────────────
+function showNotification(msg,isError=false){
+  const div=document.createElement('div');
+  div.className='notification'+(isError?' error':'');
+  div.textContent=msg;
+  document.body.appendChild(div);
+  setTimeout(()=>div.remove(),4000);
+}
+
+// ─── METRO MAP VISUALIZATION ────────────────────────────────────────────────
+function generateMetroMap(scores){
+  const lines=[
+    {name:'STR',label:'Strategie',color:'#378ADD',y:30},
+    {name:'PROD',label:'Product/R&D',color:'#EF9F27',y:60},
+    {name:'MKT',label:'Marketing',color:'#1D9E75',y:90},
+    {name:'SAL',label:'Sales',color:'#D85A30',y:120},
+    {name:'OPS',label:'Operations',color:'#2E5FA3',y:150},
+    {name:'AFS',label:'After Sales',color:'#378ADD',y:180},
+    {name:'HR',label:'HR',color:'#1D9E75',y:210},
+    {name:'FIN',label:'Finance',color:'#EF9F27',y:240},
+    {name:'IT',label:'IT',color:'#2E5FA3',y:270},
+    {name:'QUA',label:'Kwaliteit',color:'#D85A30',y:300},
+    {name:'SAF',label:'Veiligheid',color:'#378ADD',y:330}
+  ];
+
+  const accels=[
+    {name:'PM',label:'Project Mgmt',color:'#FF6B35',y:360},
+    {name:'PROC',label:'Proces Mgmt',color:'#FF6B35',y:390},
+    {name:'LEAD',label:'Leiderschap',color:'#FF6B35',y:420},
+    {name:'CHG',label:'Change Mgmt',color:'#FF6B35',y:450},
+    {name:'OWN',label:'Eigenaarschap',color:'#FF6B35',y:480}
+  ];
+
+  const allItems=[...lines,...accels];
+  let svg=`<svg viewBox="0 0 800 540" class="metro-svg" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <style>
+        .metro-line{stroke-width:3;fill:none;stroke-linecap:round}
+        .metro-label{font-size:11px;font-weight:600;fill:#1A2E4A}
+        .metro-dot{fill:#fff;stroke-width:2}
+        .metro-station{font-size:10px;fill:#1A2E4A}
+      </style>
+    </defs>`;
+
+  // Background
+  svg+=`<rect width="800" height="540" fill="#f8fafc"/>`;
+
+  // Draw metro lines
+  svg+=`<line x1="50" y1="30" x2="750" y2="30" class="metro-line" stroke="#378ADD" opacity="0.1"/>`;
+  svg+=`<line x1="50" y1="510" x2="750" y2="510" class="metro-line" stroke="#378ADD" opacity="0.1"/>`;
+
+  // Section titles
+  svg+=`<text x="10" y="50" class="metro-label" font-weight="700" font-size="12">DE 11 METROLIJNEN</text>`;
+  svg+=`<text x="10" y="370" class="metro-label" font-weight="700" font-size="12">DE 5 ORGANISATIE-VERSNELLERS</text>`;
+
+  // Draw stations
+  allItems.forEach((item,idx)=>{
+    const score=scores[item.name]||0;
+    const zone=score<=1.75?1:score<=2.5?2:score<=3.25?3:4;
+    const radius=12;
+    const x=60+(idx%15)*47;
+    const y=item.y;
+
+    // Station circle
+    svg+=`<circle cx="${x}" cy="${y}" r="${radius}" class="metro-dot" stroke="${item.color}"/>`;
+
+    // Inner color based on score
+    const fillColor=zone===1?'#D85A30':zone===2?'#EF9F27':zone===3?'#1D9E75':'#378ADD';
+    svg+=`<circle cx="${x}" cy="${y}" r="${radius-2}" fill="${fillColor}"/>`;
+
+    // Station name
+    svg+=`<text x="${x}" y="${y+35}" text-anchor="middle" class="metro-station" font-size="9">${item.label}</text>`;
+
+    // Score inside
+    svg+=`<text x="${x}" y="${y+5}" text-anchor="middle" class="metro-station" font-size="12" font-weight="700" fill="#fff">${score.toFixed(1)}</text>`;
+  });
+
+  // Legend
+  svg+=`<g>
+    <text x="60" y="515" class="metro-label" font-size="10">🔴 1.0-1.75</text>
+    <circle cx="50" cy="510" r="4" fill="#D85A30"/>
+    <text x="160" y="515" class="metro-label" font-size="10">🟠 1.76-2.50</text>
+    <circle cx="150" cy="510" r="4" fill="#EF9F27"/>
+    <text x="270" y="515" class="metro-label" font-size="10">🟢 2.51-3.25</text>
+    <circle cx="260" cy="510" r="4" fill="#1D9E75"/>
+    <text x="380" y="515" class="metro-label" font-size="10">💙 3.26-4.00</text>
+    <circle cx="370" cy="510" r="4" fill="#378ADD"/>
+  </g>`;
+
+  svg+=`</svg>`;
+  return svg;
+}
+
+// ─── EMAIL SENDING ──────────────────────────────────────────────────────────
+function sendEmailReport(naam,email,bedrijf,rapportContent,scores){
+  const templateParams={
+    to_email:email,
+    customer_name:naam,
+    company_name:bedrijf,
+    report_content:rapportContent,
+    average_score:(Object.values(scores).reduce((a,b)=>a+b,0)/Object.keys(scores).length).toFixed(1)
+  };
+
+  try{
+    emailjs.send("YOUR_SERVICE_ID","YOUR_TEMPLATE_ID",templateParams)
+      .then(()=>{
+        showNotification("Rapport verzonden naar "+email);
+        // Also notify admin
+        notifyAdmin(naam,bedrijf,email,scores);
+      })
+      .catch(err=>{
+        console.log("Email send error (offline mode):",err);
+        showNotification("Rapport opgeslagen (offline mode)");
+        notifyAdmin(naam,bedrijf,email,scores);
+      });
+  }catch(e){
+    console.log("EmailJS error:",e);
+    notifyAdmin(naam,bedrijf,email,scores);
+  }
+}
+
+function notifyAdmin(naam,bedrijf,email,scores){
+  const avgScore=(Object.values(scores).reduce((a,b)=>a+b,0)/Object.keys(scores).length).toFixed(1);
+  const notification={
+    timestamp:new Date().toISOString(),
+    naam:naam,
+    bedrijf:bedrijf,
+    email:email,
+    avgScore:avgScore,
+    scores:scores
+  };
+
+  // Store in localStorage as a demo / fallback
+  try{
+    let notifs=JSON.parse(localStorage.getItem('tnl_notifications')||'[]');
+    notifs.push(notification);
+    localStorage.setItem('tnl_notifications',JSON.stringify(notifs.slice(-50)));
+  }catch(e){console.log('localStorage error',e)}
+
+  // Send admin email via EmailJS (configure your service/template IDs)
+  const adminParams={
+    admin_email:'dirk.vandereyken@thenextlevel.be',
+    naam:naam,
+    bedrijf:bedrijf,
+    customer_email:email,
+    average_score:avgScore,
+    scores_json:JSON.stringify(scores)
+  };
+
+  try{
+    emailjs.send("YOUR_SERVICE_ID","YOUR_ADMIN_TEMPLATE_ID",adminParams)
+      .then(()=>{
+        showNotification("Admin notificatie verzonden");
+      })
+      .catch(err=>{
+        console.log('Admin email error:',err);
+        showNotification('Admin notificatie opgeslagen (offline)');
+      });
+  }catch(e){
+    console.log('EmailJS admin error:',e);
+    showNotification('Admin notificatie opgeslagen (offline)');
+  }
+}
+
 // ─── DATA ────────────────────────────────────────────────────────────────────
 const VRAGEN=[
   {t:"Het bedrijf is té afhankelijk van enkele sleutelfiguren en te veel vragen komen bij dezelfde mensen terecht.",d:["HR","OPS","OWN"],inv:true},
@@ -232,9 +441,27 @@ const BLOKKEN=[
 const PROFIEL={
   STR:{
     1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"De organisatie werkt zonder een duidelijke strategische koers. Beslissingen worden ad hoc genomen en prioriteiten verschuiven voortdurend.",herk:"Het managementteam heeft geen gedeeld beeld van waar het bedrijf naartoe wil. Vergaderingen eindigen zonder duidelijke conclusies.",impact:"Zonder strategische richting worden energie en middelen versnipperd. Groei verloopt toevallig in plaats van doelgericht.",nieuws:"Bedrijven die een heldere strategische lijn uitzetten ervaren snel meer rust en een betere afstemming.",visie:"Vaak volstaan drie heldere prioriteiten voor het komende jaar om iedereen in dezelfde richting te laten werken."},
-    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er zijn strategische intenties, maar ze zijn onvoldoende geconcretiseerd of gecommuniceerd.",herk:"De zaakvoerder weet waar het bedrijf naartoe wil, maar het middenmanagement werkt nog te veel vanuit eigen inzichten.",impact:"Strategische plannen die niet landen op de werkvloer creëren een kloof tussen intentie en uitvoering.",nieuws:"Met enkele gerichte stappen kan de organisatie de strategische lijn snel beter verankeren.",visie:"Strategie wordt pas krachtig als ze begrepen én gedragen wordt door iedereen die ze uitvoert."},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er zijn strategische intenties, maar ze zijn nog niet volledig geconcretiseerd of gecommuniceerd.",herk:"De zaakvoerder weet waar het bedrijf naartoe wil, maar het middenmanagement werkt nog te veel vanuit eigen inzichten.",impact:"Strategische plannen die niet landen op de werkvloer creëren een kloof tussen intentie en uitvoering.",nieuws:"Met enkele gerichte stappen kan de organisatie de strategische lijn snel beter verankeren.",visie:"Strategie wordt pas krachtig als ze begrepen én gedragen wordt door iedereen die ze uitvoert."},
     3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"De organisatie beschikt over een heldere strategische richting die voldoende bekend is bij het managementteam.",herk:"Er zijn jaarlijkse plannen, KPI's zijn gekend en het team werkt grotendeels in dezelfde richting.",impact:"Het risico zit in het vasthouden van focus wanneer de dagelijkse operatie druk zet op de strategische agenda.",nieuws:"Een iets strakker opvolgingsritme houdt de richting ook bij drukte zichtbaar.",visie:"Bedrijven in deze zone hebben het fundament. De volgende stap is het verhogen van de strategische veerkracht."},
     4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"De strategische lijn is helder, gedragen en vertaald naar concrete doelen op alle niveaus.",herk:"Strategische plannen worden jaarlijks bijgesteld, gevolgd via indicatoren en gecommuniceerd doorheen de organisatie.",impact:"Een sterke strategische basis laat toe sneller te beslissen en meer rendement te halen uit groei-investeringen.",nieuws:"De uitdaging is het bewaken van de strategische wendbaarheid bij marktverandering.",visie:"Dit is een stevige troef. Investeer in het onderhouden van die strategische scherpte."}
+  },
+  PROD:{
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Product- of dienstenontwikkeling gebeurt reactief, zonder systematische marktinzichten of klantfeedback.",herk:"Innovatie volgt trends of kopieert concurrenten. Er is geen structuur rond productontwikkeling of R&D.",impact:"Zonder gerichte productstrategie ontstaat een chaotisch portfolio dat moeilijk rendabel is.",nieuws:"Bedrijven met een helder productroadmap groeien sneller en efficiënter.",visie:"Begin met twee vragen: wat willen onze klanten, en waar zijn we uniek?"},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is enige product- of dienstenvernieuwing, maar ze is niet systematisch verankerd in de organisatie.",herk:"Productontwikkeling werkt toevallig goed, maar afhangt van enkele sleutelfiguren.",impact:"Inconsistente innovatie vergroot het risico op verouderde producten en gemiste marktopportuniteiten.",nieuws:"Een basis-productontwikkelingsproces kan dit snel verbeteren.",visie:"Systematiseer de kennis die nu in individuen zit."},
+    3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"Productontwikkeling volgt een redelijk duidelijk proces en klantinzichten worden meegenomen.",herk:"Er is aandacht voor markttrends en feedback. Producten worden regelmatig geëvalueerd.",impact:"Het risico zit in het verwaarlozen van innovatie als de operatie druk zet.",nieuws:"Investeer in trendmonitoring en klant co-creation voor meer differentiatie.",visie:"Sterke basis. Nu meer klant-centrische innovatie."},
+    4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Productontwikkeling is gestructureerd en markt-gestuurd. De organisatie innoveert consistent.",herk:"Klantinzichten voeden productontwikkeling. Roadmap is duidelijk en wordt regelmatig herzien.",impact:"Dit is een duurzaam concurrentievoordeel dat moeilijk te kopiëren valt.",nieuws:"Bescherm en versterken deze innovatiecapaciteit.",visie:"Dit bedrijf anticipeer op de markt in plaats van reactief te werken."}
+  },
+  MKT:{
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Marketing gebeurt nauwelijks of ad hoc. Er is geen duidelijke boodschap of doelgroepfocus.",herk:"De bedrijfswebsite is verouderd, social media wordt niet beheerd, PR is incidenteel.",impact:"Zonder marketing verliest het bedrijf relevantie en groeimomentum.",nieuws:"Zelfs bescheiden marketinginitiatieven leveren resultaat op.",visie:"Begin met helderheid: wie zijn we, wie willen we bereiken, wat is onze unieke boodschap?"},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Marketing gebeurt, maar mist samenhang en systematiek.",herk:"Verschillende kanalen worden beheerd, maar niet vanuit een gedeelde strategie.",impact:"Inefficiënte marketingspending en lage brand awareness.",nieuws:"Één helder marketingplan kan het rendement verdubbelen.",visie:"Centraliseer de boodschap, verzpreide de kanalen."},
+    3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"Marketing volgt een duidelijk plan met gerichte kanalen.",herk:"Er is aandacht voor brand consistency en klantboodschap.",impact:"Het risico zit in het verwaarlozen van innovatie in marketingkanalen.",nieuws:"Video, content marketing en influencer partnerships bieden kansen.",visie:"Stevige basis. Verdiep de klantbetrokkenheid."},
+    4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Marketing is professioneel uitgebouwd met sterke brand presence.",herk:"Multi-channel strategie, data-gestuurde targeting, sterke online presence.",impact:"Dit is een voelbare concurrentievoordeel in marktaanvraag.",nieuws:"Blijf innoveren in marketingkanalen en personalisatie.",visie:"Dit bedrijf is duidelijk zichtbaar en aansprekend voor zijn doelgroep."}
+  },
+  SAL:{
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Sales is ongestructureerd. Groei hangt af van enkele relaties of toevallige deals.",herk:"Er is geen sales pipeline, geen prospectie-proces, geen verkooptraining.",impact:"Groei is ongelijk, groei is onvoorspelbaar, groei is afhankelijk van toeval.",nieuws:"Bedrijven met een basisverkoop process groeien sneller en stabieler.",visie:"Sales is geen kunstvorm, sales is een proces."},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is enige sales structuur, maar die is niet consistent geoperationaliseerd.",herk:"Sommige verkopers volgen een proces, anderen werken op intuïtie.",impact:"Inconsistente verkoop leidt tot variabele omzet en gemiste deals.",nieuws:"Eenheid in verkoopproces vergroot conversie aanzienlijk.",visie:"Kwalificatie, voorbereiding en follow-up moeten voor alle verkopers gelijk zijn."},
+    3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"Sales volgt een duidelijk proces en pijpleiding wordt gemonitord.",herk:"Verkopers gebruiken CRM, er is rapportering op doelen.",impact:"Het risico zit in het verwaarlozen van klanttevredenheid na verkoop.",nieuws:"Account management en upsell kunnen het rendement fors verhogen.",visie:"Sterke basis. Professionaliseer verder met sales coaching."},
+    4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Sales is professioneel gestructureerd met sterke conversie.",herk:"Pipeline is gezond, forecasting is accuraat, team is gecoacht.",impact:"Dit is een voelbare groei-troef die verder rendement oplevert.",nieuws:"Blijf in sales training en marktexploratie investeren.",visie:"Dit verkoopteam is een concurrentievoordeel."}
   },
   OPS:{
     1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"De dagelijkse werking is reactief. Brandjes blussen is de norm en dezelfde problemen keren telkens terug.",herk:"Planning is rudimentair en de uitvoering hangt af van de kennis van enkele sleutelfiguren.",impact:"Operationele chaos kost geld, tijd en energie. Herwerk en laattijdige leveringen zijn directe gevolgen.",nieuws:"Bedrijven die een basisstructuur invoeren ervaren snel minder brandjes en meer rust.",visie:"Structuur begint klein: wie doet wat, wanneer, en hoe weten we of het goed gaat?"},
@@ -242,23 +469,65 @@ const PROFIEL={
     3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"De operationele werking is redelijk gestructureerd en processen worden voldoende nageleefd.",herk:"Planning en uitvoering verlopen grotendeels vlot. Er is een zekere voorspelbaarheid.",impact:"Het risico zit in het verwaarlozen van continue verbetering bij drukte of groei.",nieuws:"Een systematische verbetercyclus houdt de kwaliteit op peil bij verdere groei.",visie:"Stevige basis. De volgende stap is continue verbetering als vaste gewoonte."},
     4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Operations zijn professioneel ingericht, voorspelbaar en continu verbeterend.",herk:"Planning, uitvoering en opvolging verlopen systematisch. Problemen worden proactief geïdentificeerd.",impact:"Excellente operations zijn een duurzaam concurrentievoordeel: lagere kosten, hogere kwaliteit.",nieuws:"De uitdaging is operationele excellentie bewaken bij schaalvergroting.",visie:"Sterke troef. Blijf investeren in verbetering ook bij verdere groei."}
   },
+  AFS:{
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"After-sales service is ongestructureerd of bijna afwezig. Klanten voelen zich in de steek gelaten na aankoop.",herk:"Er is geen support process, geen klantservice team, geen feedbackloop.",impact:"Klanten verlaten voor concurrenten. Herhaalverkoop is laag. Reputatie lijdt.",nieuws:"Bescheiden after-sales attention vergroot klantloyaliteit aanzienlijk.",visie:"De relatie eindigt niet op moment van verkoop — die begint dan pas."},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is enige after-sales support, maar die is inconsistent of reactief.",herk:"Sommige klanten krijgen goede support, anderen voelen zich verwaarloosd.",impact:"Inconsistente service schaadt branding en zorgt voor gemiste upsell.",nieuws:"Systematisering van support verhoogt klantbehoud en referrals.",visie:"After-sales is een groeikans die veel bedrijven missen."},
+    3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"After-sales support volgt een duidelijk proces en klantfeedback wordt verzameld.",herk:"Er is support beschikbaar, klanten weten waar te bellen.",impact:"Het risico zit in het verwaarlozen van proactieve klantbetrokkenheid.",nieuws:"Proactief support en loyalty programma's kunnen retentie fors verhogen.",visie:"Sterke basis. Maak support een growth engine."},
+    4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"After-sales is een strategische troef met sterke klantloyaliteit.",herk:"Proactief support, loyalty programma's, upsell zijn ingeburgerd.",impact:"Dit genereert structureel meer revenue en lager churn.",nieuws:"Bescherm deze competentie en investeer in technische ondersteuning.",visie:"Dit bedrijf weet dat de relatie na verkoop pas begint."}
+  },
   HR:{
-    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"HR is nauwelijks gestructureerd. Rollen zijn onduidelijk en medewerkersbehoud is een voortdurend probleem.",herk:"Functiebeschrijvingen ontbreken. Nieuwe medewerkers vinden moeilijk hun weg. Vertrek van sleutelfiguren zorgt voor grote verstoringen.",impact:"Zwakke HR-structuur leidt tot hoge verloopkosten en een organisatie die moeilijk schaalbaar is.",nieuws:"Een basisstructuur voor HR kan snel een merkbaar verschil maken in rust en retentie.",visie:"De mensen zijn het grootste kapitaal van elke KMO."},
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"HR is nauwelijks gestructureerd. Rollen zijn onduidelijk en medewerkersbehoud vraagt aandacht.",herk:"Functiebeschrijvingen ontbreken. Nieuwe medewerkers vinden moeilijk hun weg. Vertrek van sleutelfiguren zorgt voor grote verstoringen.",impact:"De HR-structuur toont ontwikkelingspotentieel; zonder gerichte aanpak kunnen verloopkosten toenemen en schaalbaarheid beperkt blijven.",nieuws:"Een basisstructuur voor HR kan snel een merkbaar verschil maken in rust en retentie.",visie:"De mensen zijn het grootste kapitaal van elke KMO."},
     2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er zijn HR-processen, maar ze zijn niet consistent of volledig uitgewerkt.",herk:"Gesprekken met medewerkers zijn niet systematisch. Functieverwachtingen zijn niet altijd helder.",impact:"Inconsistente HR leidt tot onduidelijkheid bij medewerkers en hogere verloopkosten.",nieuws:"Door HR-processen te verduidelijken kan de medewerkerstevredenheid snel verbeteren.",visie:"De wil is aanwezig. Wat ontbreekt is een consistent HR-ritme."},
     3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"HR is voldoende gestructureerd. Rollen zijn duidelijk en evaluatiegesprekken vinden regelmatig plaats.",herk:"Aanwerving verloopt gestructureerd. Medewerkers weten wat van hen verwacht wordt.",impact:"Het risico zit in het verwaarlozen van talentontwikkeling bij verdere groei.",nieuws:"Gerichte ontwikkeltrajecten kunnen de HR-kwaliteit verder versterken.",visie:"Stevige basis. Bouw aan een organisatie die mensen aantrekt én houdt."},
     4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"HR is professioneel ingericht. Medewerkers zijn duidelijk in hun rol en worden goed begeleid.",herk:"Aanwerving, onboarding, evaluatie en ontwikkeling verlopen systematisch.",impact:"Sterke HR is een strategisch voordeel: de juiste mensen op de juiste plaats.",nieuws:"De uitdaging is de HR-kwaliteit bewaken bij verdere groei.",visie:"Mensen zijn het fundament — en dit bedrijf heeft dat begrepen."}
   },
   FIN:{
-    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Financieel inzicht is beperkt. Er is onvoldoende zicht op marges, cash of rendabiliteit.",herk:"Resultaten zijn pas bekend via de jaarrekening, maanden te laat. Beslissingen zonder financiële onderbouwing.",impact:"Zonder financieel inzicht is bijsturen onmogelijk. Het risico is groeien naar verlies zonder het te beseffen.",nieuws:"Zelfs een eenvoudig maandelijks dashboard geeft al veel meer grip.",visie:"Financieel inzicht is geen luxe. Een maandrapportering is al een enorme stap."},
-    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is enige rapportering, maar ze is onvolledig of te laat beschikbaar.",herk:"De cijfers zijn er, maar worden niet goed geïnterpreteerd voor bijsturing.",impact:"Onvoldoende financieel inzicht leidt tot suboptimale beslissingen over prijszetting en groei.",nieuws:"Door bestaande data beter te structureren kan de besluitvorming snel verbeteren.",visie:"De data is beschikbaar. Wat ontbreekt is de juiste interpretatie."},
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Financieel inzicht is beperkt. Er is beperkt zicht op marges, cash of rendabiliteit.",herk:"Resultaten zijn pas bekend via de jaarrekening, maanden te laat. Beslissingen zonder financiële onderbouwing.",impact:"Zonder financieel inzicht is bijsturen moeilijk. Het risico bestaat dat groei niet rendabel blijkt zonder tijdige sturing.",nieuws:"Zelfs een eenvoudig maandelijks dashboard geeft al veel meer grip.",visie:"Financieel inzicht is geen luxe. Een maandrapportering is al een enorme stap."},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is enige rapportering, maar ze is onvolledig of te laat beschikbaar.",herk:"De cijfers zijn er, maar worden niet altijd optimaal geïnterpreteerd voor bijsturing.",impact:"Beperkt financieel inzicht kan leiden tot suboptimale beslissingen over prijszetting en groei.",nieuws:"Door bestaande data beter te structureren kan de besluitvorming snel verbeteren.",visie:"De data is beschikbaar. Wat ontbreekt is de juiste interpretatie."},
     3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"Financiële rapportering is aanwezig en voldoende tijdig beschikbaar.",herk:"Maandelijkse rapportering is beschikbaar. Marges zijn gekend per activiteit.",impact:"Goed financieel inzicht ondersteunt betere beslissingen en verhoogt de bedrijfswaarde.",nieuws:"Diepere segmentanalyse kan de kwaliteit van beslissingen verder verhogen.",visie:"Solide basis. Verfijn het instrumentarium om proactief te sturen."},
     4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Financieel management is professioneel. Real-time inzicht in marges, cash en rendabiliteit.",herk:"Maandelijkse closing, cashflow forecasting en segmentanalyse zijn ingeburgerd.",impact:"Sterke financiële sturing verlaagt risico's en maakt het bedrijf aantrekkelijker voor investeerders.",nieuws:"De uitdaging is het instrumentarium up-to-date houden bij groei.",visie:"Finance als stuurinstrument is een van de grootste hefbomen voor waardecreatie."}
   },
+  IT:{
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"IT is ongestructureerd en onderbenut. Data zit in silos en systemen zijn niet geïntegreerd.",herk:"Geen centrale database; informatie wordt vaak handmatig gedeeld. IT wordt niet altijd ervaren als een strategische enabler.",impact:"Inefficiëntie, incorrecte gegevens en verborgen informatie kunnen besluitvorming bemoeilijken. IT ondersteunt groei niet optimaal.",nieuws:"Één geïntegreerd systeem kan productiviteit en betrouwbaarheid sterk verbeteren.",visie:"IT kan een strategische hefboom zijn wanneer systemen geïntegreerd en data toegankelijk zijn."},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er zijn IT-systemen, maar ze zijn niet goed geïntegreerd.",herk:"Verschillende tools werken in hun eigen silo. Data-uitwisseling is beperkt.",impact:"Onnodig handwerk, verborgen informatie, inefficiëntie.",nieuws:"Beter geïntegreerde tools verhogen efficiency aanzienlijk.",visie:"Integratie is het sleutelwoord in moderne IT."},
+    3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"IT-systemen zijn redelijk geïntegreerd en ondersteunen de werking.",herk:"Hoofdsystemen werken samen. Data is redelijk toegankelijk.",impact:"Het risico zit in het verwaarlozen van IT-onderhoud en security.",nieuws:"Sterke focus op cybersecurity en cloud-migrations zijn nodig.",visie:"Sterke basis. Moderniseer verder."},
+    4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"IT is volledig geïntegreerd en ondersteunt bedrijfsgroei strategisch.",herk:"Cloud-based, geautomatiseerde werkstromen, strong security.",impact:"Dit is een voelbare groei-troef.",nieuws:"Blijf in IT-innovatie investeren.",visie:"Dit bedrijf ziet IT als strategische troef."}
+  },
+  QUA:{
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Kwaliteit is niet systematisch ingebed. Controle gebeurt achteraf, problemen worden gerepareerd.",herk:"Er zijn geen QA-processen. Klachten zijn frequent. Reputatie lijdt.",impact:"Laag vertrouwen, verlies van klanten, hogere kosten door herwerk.",nieuws:"Preventief kwaliteitsmanagement kan problemen sterk verminderen.",visie:"Kwaliteit voorkomen is goedkoper dan repareren."},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is enige kwaliteitscontrole, maar die is inconsistent.",herk:"Standaarden zijn niet altijd helder of worden niet consequent nageleefd.",impact:"Variabele kwaliteit schaadt klantvertrouwen.",nieuws:"Heldere standaarden en consequente controle kunnen dit snel verbeteren.",visie:"Kwaliteit begint met duidelijkheid."},
+    3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"Kwaliteit volgt systematische normen en wordt regelmatig gecontroleerd.",herk:"Standaarden zijn duidelijk en controle is ingeburgerd.",impact:"Het risico zit in het verwaarlozen van verdere optimalisering.",nieuws:"Klantfeedback meer gebruiken voor voortdurende verbetering.",visie:"Sterke basis. Verhoog naar proactieve kwaliteit."},
+    4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Kwaliteit is een organisatiewaarde. Proactief beheer en voortdurende verbetering.",herk:"Zero-defect mentality, systematische verbeteringen, klantfeedback geïnstilleerd.",impact:"Dit is een duurzaam voordeel.",nieuws:"Bescherm dit.",visie:"Dit bedrijf staat voor kwaliteit."}
+  },
+  SAF:{
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Veiligheid en gezondheid zijn niet gestructureerd. Risico's worden genegeerd.",herk:"Geen veiligheidsbeleid, geen trainingen, ongevallen gebeuren.",impact:"Zwaar: juridische consequenties, reputatieschade, verlies van medewerkers.",nieuws:"Basisveiligheid vermindt risico snel.",visie:"Veiligheid is niet optioneel."},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is enig veiligheidsbeleid, maar het is niet volledig geïmplementeerd.",herk:"Afspraken zijn gemaakt, maar worden niet consistent nageleefd.",impact:"Risico is hoger dan nodig.",nieuws:"Consistente implementatie van veiligheid kan risico snel dalen.",visie:"Veiligheid begint met cultuur."},
+    3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"Veiligheid volgt systemen en wordt regelmatig gemonitord.",herk:"Beleid is helder, trainingen vinden plaats.",impact:"Het risico zit in het verwaarlozen van verdere verbetering.",nieuws:"Sterker veiligheidsmanagement kan verder risico doen dalen.",visie:"Sterke basis. Blijf investeren."},
+    4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Veiligheid is een organisatiewaarde. Proactief beheer, continue verbetering.",herk:"Sterke veiligheids cultuur, nul-ongevallen ambitie.",impact:"Dit beschermt het bedrijf.",nieuws:"Bescherm dit.",visie:"Dit bedrijf neemt veiligheid serieus."}
+  },
+  PM:{
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Projecten hebben geen duidelijke structuur. Ze verlopen chaotisch met veel wijzigingen.",herk:"Geen duidelijke doelen, scope, timeline. Projecten worden meestal laat of over budget afgewerkt.",impact:"Projecten falen frequent. Vertrouwen in aanbesteding daalt.",nieuws:"Een basisproject management framework kan dit snel verbeteren.",visie:"Projecten zijn mini-bedrijven. Ze verdienen structuur."},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is enig projectmanagement, maar het is inconsistent.",herk:"Sommige projecten volgen processen, anderen niet.",impact:"Onvoorspelbare projectresultaten.",nieuws:"Gestandaardiseerd project management verhoogt succes.",visie:"Eenheid in aanpak leidt tot betere resultaten."},
+    3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"Projectmanagement volgt duidelijke normen. Projecten worden redelijk beheerst.",herk:"Doelen, scope en planning zijn duidelijk.",impact:"Het risico zit in het verwaarlozen van projectportefeuille management.",nieuws:"Portfolio management kan projectlezing verder verbeteren.",visie:"Sterke basis. Verfijn het management."},
+    4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Projectmanagement is professioneel. Projecten slagen consistent.",herk:"Sterke PM cultuur, portfolio management, risicobeheer.",impact:"Dit is een voelbare concurrentievoordeel.",nieuws:"Bescherm deze competentie.",visie:"Dit bedrijf levert projecten af."}
+  },
+  PROC:{
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Processen zijn niet gedocumenteerd. Iedereen werkt anders.",herk:"Er is veel verwarring. Training van nieuwe medewerkers duurt lang.",impact:"Inefficiëntie, fouten, verborgen kosten.",nieuws:"Basisdocumentatie van processen kan veel voordeel opleveren.",visie:"Processen zijn het skelet van bedrijven."},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er zijn processen gedocumenteerd, maar ze worden niet altijd gevolgd.",herk:"Documentatie bestaat, maar praktijk wijkt af.",impact:"Variabiliteit in operaties.",nieuws:"Afstemming tussen documentatie en praktijk kan dit snel verbeteren.",visie:"Processen zijn alleen nuttig als ze gevolgd worden."},
+    3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"Processen zijn duidelijk gedocumenteerd en worden redelijk gevolgd.",herk:"Training is gebaseerd op procesdocumentatie.",impact:"Het risico zit in het verwaarlozen van process optimization.",nieuws:"Regelmatige process reviews en optimisaties verhogen efficiency.",visie:"Sterke basis. Ga naar continuous improvement."},
+    4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Proces management is ingeburgerd. Processen worden continu verbeterd.",herk:"Sterke process discipline, continuous improvement cyclus.",impact:"Dit geeft efficiency en schaalbaarheid.",nieuws:"Bescherm deze cultuur.",visie:"Dit bedrijf werkt gestructureerd."}
+  },
   LEAD:{
-    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Leiderschapscapaciteit is beperkt of geconcentreerd bij één persoon.",herk:"Beslissingen blijven bij de top omdat het middenmanagement onvoldoende capabel is. Medewerkers wachten op instructies.",impact:"Zwak leiderschap remt de schaalbaarheid. De zaakvoerder blijft gevangen in operationele beslissingen.",nieuws:"Gerichte leiderschapsontwikkeling kan snel leiden tot meer zelfstandigheid.",visie:"Leiderschap is een vaardigheid die geleerd kan worden."},
-    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is leiderschapspotentieel, maar leidinggevenden zijn onvoldoende gecoacht of ondersteund.",herk:"Leidinggevenden zijn goed in hun technisch domein maar minder sterk in people management.",impact:"Onvoldoende leiderschapskapaciteit leidt tot grote afhankelijkheid van de zaakvoerder.",nieuws:"Gerichte coaching kan de organisatie snel winnen aan zelfstandigheid.",visie:"Het potentieel is er. Gerichte begeleiding maakt het verschil."},
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Leiderschapscapaciteit is beperkt of geconcentreerd bij één persoon.",herk:"Beslissingen blijven bij de top omdat het middenmanagement nog verdere ontwikkeling kan gebruiken. Medewerkers wachten te makkelijk op instructies.",impact:"Leiderschap toont ontwikkelingspotentieel; gerichte ontwikkeling vergroot de schaalbaarheid en maakt ruimte voor strategisch werken.",nieuws:"Gerichte leiderschapsontwikkeling kan snel leiden tot meer zelfstandigheid.",visie:"Leiderschap is een vaardigheid die geleerd kan worden."},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is leiderschapspotentieel, maar leidinggevenden hebben nog ruimte voor gerichte coaching of ondersteuning.",herk:"Leidinggevenden zijn goed in hun technisch domein maar kunnen groeien in people management.",impact:"Beperkte leiderschapskapaciteit kan leiden tot grotere afhankelijkheid van de zaakvoerder.",nieuws:"Gerichte coaching kan de organisatie snel winnen aan zelfstandigheid.",visie:"Het potentieel is er. Gerichte begeleiding maakt het verschil."},
     3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"Leiderschap is voldoende sterk. Leidinggevenden krijgen mensen mee en communiceren helder.",herk:"Het managementteam functioneert goed. Er is voldoende psychologische veiligheid.",impact:"Goed leiderschap draagt bij aan retentie, motivatie en resultaat.",nieuws:"Leiderschapsontwikkeling op alle niveaus bouwt een strategisch voordeel op.",visie:"Sterke basis. Verankeren en vermenigvuldigen is de volgende stap."},
     4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Leiderschap is een organisatiecompetentie op alle niveaus.",herk:"Er is een leiderschapscultuur die medewerkers aanmoedigt verantwoordelijkheid te nemen.",impact:"Sterk leiderschap vergroot het veranderingsvermogen, de retentie en het innovatievermogen.",nieuws:"De uitdaging is de leiderschapscultuur bewaken bij verdere groei.",visie:"Leiderschap als cultuur is het fundament van een duurzame organisatie."}
+  },
+  CHG:{
+    1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Veranderingen worden niet altijd doelgericht beheerd. Initiatieven lopen risico op vertraging of extra kosten.",herk:"Er is nog geen gestandaardiseerd change framework. Medewerkers ervaren onzekerheid bij grote wijzigingen.",impact:"Veranderingsinitiatieven lopen risico op vertraging of extra kosten, wat de realisatietijd verlengt.",nieuws:"Goed veranderingsbeheer verhoogt de slaagkans van projecten aanzienlijk.",visie:"Verandering werkt best als een gepland proces met duidelijke communicatie en betrokkenheid."},
+    2:{badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is enig veranderingsmanagement, maar het is inconsistent.",herk:"Communicatie over verandering is beperkt. Buy-in is nog niet volledig.",impact:"Veranderingsinitiatieven kunnen vertragen of verliezen aan draagvlak.",nieuws:"Betere communicatie en betrokkenheid kunnen succespercentage sterk verhogen.",visie:"Verandering slaagt als je mensen meeneemt."},
+    3:{badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"Veranderingen volgen een redelijk duidelijk proces.",herk:"Communicatie is duidelijk. Training wordt gegeven.",impact:"Het risico zit in het verwaarlozen van bedrijfscultuur.",nieuws:"Sterker alignment met cultuur kan succes verder verhogen.",visie:"Sterke basis. Ga naar change as capability."},
+    4:{badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Veranderingsmanagement is ingeburgerd. Organisatie leert snel.",herk:"Sterke change culture. Medewerkers omarmen verandering.",impact:"Dit is een voelbare wendbaarheid in het bedrijf.",nieuws:"Bescherm deze cultuur.",visie:"Dit bedrijf kan zich aanpassen."}
   },
   OWN:{
     1:{badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Verantwoordelijkheden zijn onduidelijk verdeeld. Te veel beslissingen komen bij de directie terecht.",herk:"Medewerkers wachten op instructies. De zaakvoerder wordt overspoeld door vragen.",impact:"Een organisatie zonder eigenaarschap is moeilijk schaalbaar.",nieuws:"Heldere verantwoordelijkheden maken de organisatie snel zelfstandiger.",visie:"Eigenaarschap vraagt duidelijkheid, vertrouwen en het durven loslaten van controle."},
@@ -271,7 +540,7 @@ const PROFIEL={
 function getFallback(z){
   const f=[
     {badge:"badge-r",bar:"bar-r",barlbl:"🔴 Kritische groeipijn",wat:"Op dit domein zijn er duidelijke groeikansen die prioritaire aandacht verdienen.",herk:"Bedrijven in deze zone ervaren regelmatig terugkerende problemen op dit vlak.",impact:"Zonder gerichte aanpak kan dit de groei en het rendement significant afremmen.",nieuws:"Gerichte acties leveren op dit domein vaak snel merkbare verbeteringen op.",visie:"Dit is een prioritair aandachtspunt dat we samen graag verder verkennen."},
-    {badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is een basis aanwezig, maar die is nog onvoldoende consistent uitgewerkt.",herk:"Bedrijven in deze zone missen de rode draad om initiatieven duurzaam te verankeren.",impact:"Inconsistentie leidt tot gemiste kansen en hogere operationele kosten.",nieuws:"Met gerichte stappen kan dit domein snel versterkt worden.",visie:"De bouwblokken zijn er. Een heldere structuur maakt het verschil."},
+    {badge:"badge-o",bar:"bar-o",barlbl:"🟠 Aandachtspunt",wat:"Er is een basis aanwezig, maar die is nog niet consistent uitgewerkt.",herk:"Bedrijven in deze zone missen de rode draad om initiatieven duurzaam te verankeren.",impact:"Inconsistentie leidt tot gemiste kansen en hogere operationele kosten.",nieuws:"Met gerichte stappen kan dit domein snel versterkt worden.",visie:"De bouwblokken zijn er. Een heldere structuur maakt het verschil."},
     {badge:"badge-g",bar:"bar-g",barlbl:"🟢 Goed ontwikkeld",wat:"Er is een solide basis aanwezig die voldoende consistent wordt toegepast.",herk:"De organisatie doet het op dit vlak beter dan veel vergelijkbare bedrijven.",impact:"Het risico zit in het verwaarlozen van verdere ontwikkeling bij groei.",nieuws:"Gerichte optimalisatie kan dit domein van goed naar uitstekend brengen.",visie:"Sterke basis. Blijf investeren om dit voordeel te consolideren."},
     {badge:"badge-b",bar:"bar-b",barlbl:"💙 Sterke troef",wat:"Dit domein is professioneel uitgebouwd en vormt een echte troef.",herk:"De organisatie scoort aantoonbaar beter dan vergelijkbare KMO's.",impact:"Dit is een duurzaam concurrentievoordeel dat moeilijk te kopiëren is.",nieuws:"De uitdaging is dit voordeel te bewaken bij verdere groei.",visie:"Uitstekend. Koester en onderhoud deze competentie."}
   ];
@@ -412,6 +681,7 @@ function domeinBlock(code,scores){
 function buildRapport(){
   const naam=document.getElementById('f-naam').value.trim();
   const bedrijf=document.getElementById('f-bedrijf').value.trim();
+  const email=document.getElementById('f-email').value.trim();
   const scores=calcScores();
   const zwak=Object.keys(scores).sort((a,b)=>scores[a]-scores[b]).slice(0,3);
   const gem=Math.round(Object.values(scores).reduce((a,b)=>a+b,0)/Object.values(scores).length*10)/10;
@@ -422,11 +692,13 @@ function buildRapport(){
     ?"Uw organisatie heeft een degelijke basis op de meeste vlakken. Er zijn echter domeinen waar gerichte verbetering snel extra rendement, rust en groeicapaciteit kan opleveren. De fundamenten zijn aanwezig — nu is het zaak om gericht te versterken waar het meeste verschil te maken valt."
     :"Uw organisatie is professioneel uitgebouwd op de meeste vlakken en beschikt over sterke troeven die u onderscheiden van de meeste KMO's in uw sector. Het is nu zaak die troeven te bewaken bij verdere groei en de resterende groeikansen gericht aan te pakken.";
 
-  document.getElementById('rapport-content').innerHTML=`
+  const rapportHtml=`
 <div class="r-hero">
   <h1>Metroplan Quick Scan</h1>
   <p>${bedrijf} &nbsp;&middot;&nbsp; ${naam} &nbsp;&middot;&nbsp; The Next Level</p>
 </div>
+<div class="r-section-title">Visuele Metroplan Kaart</div>
+<div class="metro-map">${generateMetroMap(scores)}</div>
 <div class="r-section-title">Onze eerste indruk</div>
 <div class="r-indruk">${gt}</div>
 <div class="r-section-title">De 11 metrolijnen</div>
@@ -447,8 +719,13 @@ ${zwak.map(code=>{
 <div class="r-cta">
   <h2>Klaar om de volgende stap te zetten?</h2>
   <p>In een gratis gesprek van 30 minuten bespreken we uw resultaten en de meest concrete volgende stap voor uw bedrijf. Geen verplichtingen, wél direct inzicht.</p>
-  <a href="mailto:dirk@ariadnebvba.be?subject=Quick%20Scan%20bespreken%20-%20${encodeURIComponent(bedrijf)}&body=Beste%20Dirk%2C%0A%0AIk%20heb%20de%20Metroplan%20Quick%20Scan%20ingevuld%20en%20wil%20graag%20de%20resultaten%20bespreken.%0A%0ANaam%3A%20${encodeURIComponent(naam)}%0ABedrijf%3A%20${encodeURIComponent(bedrijf)}%0A%0AMet%20vriendelijke%20groeten">Plan een gratis gesprek &rarr;</a>
+  <a href="mailto:dirk.vandereyken@thenextlevel.be?subject=Quick%20Scan%20bespreken%20-%20${encodeURIComponent(bedrijf)}&body=Beste%20Dirk%2C%0A%0AIk%20heb%20de%20Metroplan%20Quick%20Scan%20ingevuld%20en%20wil%20graag%20de%20resultaten%20bespreken.%0A%0ANaam%3A%20${encodeURIComponent(naam)}%0ABedrijf%3A%20${encodeURIComponent(bedrijf)}%0A%0AMet%20vriendelijke%20groeten">Plan een gratis gesprek &rarr;</a>
 </div>`;
+
+  document.getElementById('rapport-content').innerHTML=rapportHtml;
+  
+  // Send email report to customer
+  sendEmailReport(naam,email,bedrijf,rapportHtml,scores);
 }
 
 function toggleExtra(id,el){

@@ -156,7 +156,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <div class="intro-box">
       <p>Deze gratis Quick Scan brengt in kaart hoe uw organisatie scoort op de <strong>11 metrolijnen</strong> en <strong>5 organisatieversnellers</strong> van The Next Level. U beantwoordt 30 uitspraken en ontvangt daarna een gepersonaliseerd rapport met uw sterktes en groeikansen.</p>
       <p>Beantwoord elke uitspraak zo eerlijk mogelijk op basis van uw dagelijkse realiteit. Er zijn geen goede of foute antwoorden — enkel uw werkelijke situatie telt.</p>
-      <p><strong>Hoe vaak is de uitspraak van toepassing op uw organisatie?</strong></p>
+      <p><strong>Welke uitspraak is van toepassing op jouw organisatie?</strong></p>
       <div class="scale-legend">
         <div class="sl-item" style="background:var(--red-bg);color:var(--red-txt)">Klopt niet voor ons</div>
         <div class="sl-item" style="background:var(--ora-bg);color:var(--ora-txt)">Klopt gedeeltelijk</div>
@@ -737,10 +737,17 @@ function startScan(){
 function nextBlock(b){
   const start=(b-1)*5;
   for(let i=start;i<start+5;i++){
-    if(!rawAns[i]){alert('Beantwoord alle vragen in dit blok voor u verdergaat.');return;}
+    if(!rawAns[i]){
+      alert('Beantwoord alle vragen in dit blok voor u verdergaat.');
+      return;
+    }
   }
-  if(b===6)buildRapport();
-  goStep(b===6?7:b+1);
+  if(b===6){
+    buildRapport();
+    goStep(7);
+  } else {
+    goStep(b+1);
+  }
 }
 
 function calcScores(){
@@ -785,7 +792,7 @@ function buildRapport(){
   const scores=calcScores();
   const zwak=Object.keys(scores).sort((a,b)=>scores[a]-scores[b]).slice(0,3);
   const sterk=Object.keys(scores).sort((a,b)=>scores[b]-scores[a]).slice(0,2);
-  stuurNotificatie(naam,bedrijf,document.getElementById('f-email').value.trim(),functie,mw,sector,scores,gem,gz);
+  try{stuurNotificatie(naam,bedrijf,document.getElementById('f-email').value.trim(),functie,mw,sector,scores,gem,gz);}catch(e){console.log('Mail fout:',e);}
   const gem=Math.round(Object.values(scores).reduce((a,b)=>a+b,0)/Object.values(scores).length*10)/10;
   const gz=getZone(gem);
 

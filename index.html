@@ -154,7 +154,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   /* Kleuren forceren */
   .r-domain{break-inside:avoid;page-break-inside:avoid}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-  /* Metroplan canvas verbergen, alleen afbeelding tonen */
+  /* mailto links verbergen bij print */
+  a[href^="mailto"]{display:none!important}
+  .r-cta-sub{display:none!important}
   .metro-wrap canvas{display:none!important}
   .metro-wrap{position:relative!important}
   .metro-section{break-inside:avoid}
@@ -232,6 +234,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <div class="site-title">Metroplan Quick Scan</div>
     <div class="site-sub">Hoe gezond is uw organisatie écht? — 10 minuten, eerlijk antwoord.</div>
   </div>
+  <button class="test-btn no-print" onclick="testInvullen()" title="Test met Frank Peeters / Ineos" style="margin-left:auto;background:#f0f4f8;border:1.5px solid #cbd5e1;color:#64748b;padding:6px 12px;border-radius:8px;font-size:11px;cursor:pointer">⚡ Test</button>
 </div>
 
 <div class="progress-wrap no-print">
@@ -1102,12 +1105,13 @@ ${topVers.map((code,idx)=>{
   <p style="margin-top:14px;font-style:normal;color:#334155;font-size:13px;line-height:1.7"><strong>Hieronder vindt u de gedetailleerde resultaten.</strong> Deze geven u nog meer inzicht in elk domein afzonderlijk — wat er speelt, wat de impact is en waar de grootste groeikansen liggen. Neem er rustig de tijd voor, of <strong>plan meteen een gesprek</strong> om samen de volgende stap te zetten.</p>
 </div>
 
-<div class="no-print" style="background:#1A2E4A;border-radius:12px;padding:20px 24px;margin:20px 0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px">
-  <div>
-    <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px">Liever meteen verder? Wij bespreken uw resultaten graag.</div>
-    <div style="font-size:14px;color:#93c5fd">Dirk Vander Eyken &nbsp;&middot;&nbsp; +32 468 13 79 78 &nbsp;&middot;&nbsp; <a href="mailto:info@thenextlevel.consulting" class="link-plain" style="color:#93c5fd">info@thenextlevel.consulting</a></div>
+<div class="no-print" style="background:#1A2E4A;border-radius:12px;padding:20px 24px;margin:20px 0">
+  <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px">Liever meteen verder? Wij bespreken uw resultaten graag.</div>
+  <div style="font-size:14px;color:#93c5fd;margin-bottom:14px">Dirk Vander Eyken &nbsp;&middot;&nbsp; +32 468 13 79 78 &nbsp;&middot;&nbsp; <a href="mailto:info@thenextlevel.consulting" class="link-plain" style="color:#93c5fd">info@thenextlevel.consulting</a></div>
+  <div style="display:flex;flex-wrap:wrap;gap:10px">
+    <a href="mailto:info@thenextlevel.consulting?subject=Aanvraag%20gratis%20gesprek%20-%20${encodeURIComponent(bedrijf)}&body=Beste%20Dirk%2C%0A%0AIk%20heb%20de%20Metroplan%20Quick%20Scan%20ingevuld%20en%20wil%20graag%20een%20gratis%20gesprek%20plannen.%0A%0ANaam%3A%20${encodeURIComponent(naam)}%0ABedrijf%3A%20${encodeURIComponent(bedrijf)}%0A%0AMet%20vriendelijke%20groeten%2C%0A${encodeURIComponent(naam)}" style="display:inline-block;background:#fff;color:#1A2E4A;text-decoration:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700">📅 Plan een gratis gesprek</a>
+    <a href="mailto:info@thenextlevel.consulting?subject=Vraag%20over%20mijn%20Quick%20Scan%20-%20${encodeURIComponent(bedrijf)}" style="display:inline-block;background:transparent;color:#fff;text-decoration:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;border:1.5px solid rgba(255,255,255,.4)">✉️ Meer inlichtingen</a>
   </div>
-  <a href="mailto:dirk@ariadnebvba.be?subject=Quick%20Scan%20bespreken%20-%20${encodeURIComponent(bedrijf)}&body=Beste%20Dirk%2C%0A%0AIk%20heb%20de%20Metroplan%20Quick%20Scan%20ingevuld%20en%20wil%20graag%20de%20resultaten%20bespreken.%0A%0ANaam%3A%20${encodeURIComponent(naam)}%0ABedrijf%3A%20${encodeURIComponent(bedrijf)}%0A%0AMet%20vriendelijke%20groeten" style="background:#fff;color:#1A2E4A;text-decoration:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;white-space:nowrap">Plan een gratis gesprek &rarr;</a>
 </div>
 
 <div class="r-section-title">5. Detailresultaten</div>
@@ -1121,9 +1125,12 @@ ${[...VERSNELLERS].sort((a,b)=>scores[a]-scores[b]).map(c=>domeinBlock(c,scores,
 <div class="r-cta no-print">
   <h2>Klaar om de volgende stap te zetten?</h2>
   <p>Bij een kop koffie bespreken we uw resultaten en de meest concrete volgende stap voor uw bedrijf. Geen verplichtingen — wél direct inzicht in waar de grootste winst te halen valt.</p>
-  <a href="mailto:info@thenextlevel.consulting?subject=Quick%20Scan%20bespreken%20-%20${encodeURIComponent(bedrijf)}&body=Beste%20Dirk%2C%0A%0AIk%20heb%20de%20Metroplan%20Quick%20Scan%20ingevuld%20en%20wil%20graag%20de%20resultaten%20bespreken.%0A%0ANaam%3A%20${encodeURIComponent(naam)}%0ABedrijf%3A%20${encodeURIComponent(bedrijf)}%0A%0AMet%20vriendelijke%20groeten" style="display:inline-block;background:#fff;color:#1A2E4A;text-decoration:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;margin-top:8px">Plan een gratis gesprek &rarr;</a>
-  <div class="r-cta-sub" style="font-size:15px;color:#fff;margin-top:14px">Dirk Vander Eyken &nbsp;&middot;&nbsp; +32 468 13 79 78 &nbsp;&middot;&nbsp; <a href="mailto:info@thenextlevel.consulting" class="link-plain">info@thenextlevel.consulting</a></div>
-  <button class="print-btn" onclick="window.print()">&#128231; Stuur me dit rapport door</button>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;justify-content:center">
+    <a href="mailto:info@thenextlevel.consulting?subject=Aanvraag%20gratis%20gesprek%20-%20${encodeURIComponent(bedrijf)}&body=Beste%20Dirk%2C%0A%0AIk%20heb%20de%20Metroplan%20Quick%20Scan%20ingevuld%20en%20wil%20graag%20een%20gratis%20gesprek%20plannen%20om%20de%20resultaten%20te%20bespreken.%0A%0ANaam%3A%20${encodeURIComponent(naam)}%0ABedrijf%3A%20${encodeURIComponent(bedrijf)}%0AFunctie%3A%20${encodeURIComponent(functie||'')}%0A%0AMet%20vriendelijke%20groeten%2C%0A${encodeURIComponent(naam)}" style="display:inline-block;background:#fff;color:#1A2E4A;text-decoration:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700">📅 Plan een gratis gesprek</a>
+    <button class="print-btn" onclick="window.print()" style="margin-top:0">📄 Stuur me dit rapport door</button>
+    <a href="mailto:info@thenextlevel.consulting?subject=Vraag%20over%20mijn%20Quick%20Scan%20-%20${encodeURIComponent(bedrijf)}" style="display:inline-block;background:transparent;color:#fff;text-decoration:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;border:1.5px solid rgba(255,255,255,.4)">✉️ Contacteer ons voor meer inlichtingen</a>
+  </div>
+  <div class="r-cta-sub" style="font-size:14px;color:#fff;margin-top:16px">Dirk Vander Eyken &nbsp;&middot;&nbsp; +32 468 13 79 78 &nbsp;&middot;&nbsp; <a href="mailto:info@thenextlevel.consulting" class="link-plain">info@thenextlevel.consulting</a></div>
   <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.2);font-size:11px;color:rgba(255,255,255,.6);text-align:center">
     Rapport gegenereerd op ${new Date().toLocaleDateString('nl-BE',{day:'2-digit',month:'long',year:'numeric'})} &nbsp;&middot;&nbsp; &copy; ${new Date().getFullYear()} The Next Level &nbsp;&middot;&nbsp; thenextlevel.consulting
   </div>
@@ -1151,6 +1158,12 @@ function stuurNotificatie(naam,bedrijf,email,functie,mw,sector,scores,gem,gz){
     return DOMAINS[d]+': '+scores[d]+'/4 ('+p.lbl+')';
   }).join('\n');
 
+  // Print-indicator bijhouden
+  window._pdfAfgedrukt = false;
+  window.addEventListener('beforeprint', function(){
+    window._pdfAfgedrukt = true;
+  });
+
   // Mail 1: notificatie naar Dirk
   emailjs.send('TNL_Service','template_3ebr3lk',{
     to_name:'Dirk',
@@ -1164,11 +1177,35 @@ function stuurNotificatie(naam,bedrijf,email,functie,mw,sector,scores,gem,gz){
     tel:document.getElementById('f-tel')?document.getElementById('f-tel').value.trim()||'Niet ingevuld':'Niet ingevuld',
     score:gem+' / 4',
     rapport:scoresTxt,
+    pdf_afgedrukt: 'Nog niet afgedrukt',
     datum:new Date().toLocaleDateString('nl-BE',{day:'2-digit',month:'long',year:'numeric'})
   }).then(function(){
     console.log('Notificatie verstuurd naar Dirk');
   },function(err){
     console.log('EmailJS fout notificatie:',err);
+  });
+
+  // Aparte mail sturen als ze afdrukken
+  window.addEventListener('beforeprint', function(){
+    if(window._pdfNotificatieGestuurd) return;
+    window._pdfNotificatieGestuurd = true;
+    emailjs.send('TNL_Service','template_3ebr3lk',{
+      to_name:'Dirk',
+      to_email:'info@thenextlevel.consulting',
+      naam:naam,
+      bedrijf:bedrijf,
+      from_email:email,
+      functie:functie||'Niet ingevuld',
+      medewerkers:mw||'Niet ingevuld',
+      sector:sector||'Niet ingevuld',
+      tel:document.getElementById('f-tel')?document.getElementById('f-tel').value.trim()||'Niet ingevuld':'Niet ingevuld',
+      score:gem+' / 4',
+      rapport:scoresTxt,
+      pdf_afgedrukt: '✅ JA — rapport afgedrukt of opgeslagen als PDF',
+      datum:new Date().toLocaleDateString('nl-BE',{day:'2-digit',month:'long',year:'numeric'})
+    }).then(function(){
+      console.log('PDF notificatie verstuurd');
+    });
   });
 
   // Mail 2: bevestiging naar invuller
@@ -1345,12 +1382,11 @@ function tekenBeideSpin(scores){
 
 
 function testInvullen(){
-  // Zorg dat blokken gebouwd zijn
   if(!document.getElementById('step-1').innerHTML){
-    // Vul naam/bedrijf/email in als nog leeg
-    if(!document.getElementById('f-naam').value) document.getElementById('f-naam').value = 'Test Gebruiker';
-    if(!document.getElementById('f-bedrijf').value) document.getElementById('f-bedrijf').value = 'Test Bedrijf bv.';
-    if(!document.getElementById('f-email').value) document.getElementById('f-email').value = 'test@test.be';
+    document.getElementById('f-naam').value = 'Frank Peeters';
+    document.getElementById('f-bedrijf').value = 'Ineos';
+    document.getElementById('f-email').value = 'dirk@ariadnebvba.be';
+    document.getElementById('f-functie').value = 'CEO';
     buildBlocks();
     goStep(1);
     setTimeout(testInvullen, 100);

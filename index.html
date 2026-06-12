@@ -1244,7 +1244,7 @@ function vraagGesprek(btnId){
     document.querySelectorAll('.btn-gesprek').forEach(function(b){
       b.textContent='✅ Aanvraag verstuurd';
       b.disabled=true;
-      b.setAttribute('style', b.getAttribute('style').replace(/color:[^;]+;?/g,'') + ';background:#00C850;color:#fff;cursor:default;border:none;');
+      b.setAttribute('style','background:#00C850 !important;color:#fff !important;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:default;display:inline-block;');
     });
     console.log('Gesprek aangevraagd');
   },function(err){

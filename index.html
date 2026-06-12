@@ -1229,9 +1229,17 @@ function vraagGesprek(btnId){
     document.querySelectorAll('.btn-gesprek').forEach(function(b){
       b.textContent='✅ Aanvraag verstuurd';
       b.disabled=true;
-      b.style.background='#1A2E4A';
-      b.style.color='#fff';
       b.style.cursor='default';
+      // Mini CTA (btn-gesprek-2) staat op donkere achtergrond → witte knop met donkere tekst
+      // Grote CTA (btn-gesprek-1) staat op gradient → zelfde stijl behouden
+      if(b.id==='btn-gesprek-2'){
+        b.style.background='#fff';
+        b.style.color='#1A2E4A';
+      } else {
+        b.style.background='#fff';
+        b.style.color='#1A2E4A';
+        b.style.opacity='0.85';
+      }
     });
     console.log('Gesprek aangevraagd');
   },function(err){

@@ -234,7 +234,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <div class="site-title">Metroplan Quick Scan</div>
     <div class="site-sub">Hoe gezond is uw organisatie écht? — 10 minuten, eerlijk antwoord.</div>
   </div>
-  <button class="test-btn no-print" onclick="testInvullen()" title="Test met Frank Peeters / Ineos">⚡ Test</button>
 </div>
 
 <div class="progress-wrap no-print">
@@ -584,11 +583,11 @@ function buildRapport(){
     </div>
     <div>
       <h1>Metroplan Quick Scan</h1>
-      <p>${bedrijf}${functie?' · '+functie:''}${mw?' · '+mw+' medewerkers':''}</p>
+      <p>Bedrijf: ${bedrijf}${mw?' · '+mw+' medewerkers':''}</p>
     </div>
   </div>
   <div class="r-meta">
-    <div class="r-meta-item"><span class="r-meta-label">Ingevuld door</span><span class="r-meta-val">${naam}</span></div>
+    <div class="r-meta-item"><span class="r-meta-label">Ingevuld door</span><span class="r-meta-val">${naam}${functie?'<br><span style="font-size:11px;font-weight:400;opacity:.8">'+functie+'</span>':''}</span></div>
     <div class="r-meta-item"><span class="r-meta-label">Gemiddelde score</span><span class="r-meta-val">${gem} / 4</span></div>
     <div class="r-meta-item"><span class="r-meta-label">Profiel</span><span class="r-meta-val">${gz===1?'Kritisch':gz===2?'Aandacht nodig':gz===3?'Goed ontwikkeld':'Sterk profiel'}</span></div>
   </div>
@@ -711,7 +710,7 @@ ${[...VERSNELLERS].sort((a,b)=>scores[a]-scores[b]).map(c=>domeinBlock(c,scores,
   <p>Bij een kop koffie bespreken we uw resultaten en de meest concrete volgende stap voor uw bedrijf. Geen verplichtingen — wél direct inzicht in waar de grootste winst te halen valt.</p>
   <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;justify-content:center">
     <button id="btn-gesprek-1" class="btn-gesprek" onclick="vraagGesprek('btn-gesprek-1')" style="background:#fff;color:#1A2E4A;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;cursor:pointer">📅 Plan een gratis gesprek</button>
-    <button class="print-btn" onclick="window.print()" style="margin-top:0">📄 Stuur me dit rapport door</button>
+    <button class="print-btn" onclick="this.setAttribute('style','background:#00C850;color:#fff;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;cursor:default;');this.textContent='✅ Rapport wordt afgedrukt';window.print();" style="margin-top:0">📄 Stuur me dit rapport door</button>
     <a href="mailto:dirk@ariadnebvba.be?subject=Vraag%20over%20mijn%20Quick%20Scan%20-%20${encodeURIComponent(bedrijf)}" style="display:inline-block;background:transparent;color:#fff;text-decoration:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;border:1.5px solid rgba(255,255,255,.4)">✉️ Contacteer ons voor meer inlichtingen</a>
   </div>
   <div class="r-cta-sub" style="font-size:14px;color:#fff;margin-top:16px">Dirk Vander Eyken &nbsp;&middot;&nbsp; +32 468 13 79 78 &nbsp;&middot;&nbsp; <a href="https://www.thenextlevel.consulting" target="_blank" class="link-plain">www.thenextlevel.consulting</a></div>

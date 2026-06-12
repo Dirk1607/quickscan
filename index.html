@@ -839,14 +839,10 @@ function vraagGesprek(btnId){
 }
 
 function window_doPrint(btn){
-  window.print();
-  // Na het printen (afterprint event) knop groen maken
-  window.addEventListener('afterprint', function onAfterPrint(){
-    window.removeEventListener('afterprint', onAfterPrint);
-    btn.setAttribute('style','background:#00C850;color:#fff;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;cursor:default;');
-    btn.textContent='✅ Rapport afgedrukt';
-    btn.disabled=true;
-  });
+  btn.setAttribute('style','background:#00C850;color:#fff;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;cursor:default;');
+  btn.textContent='✅ Rapport afgedrukt';
+  btn.disabled=true;
+  setTimeout(function(){ window.print(); }, 100);
 }
 window._doPrint = window_doPrint;
 

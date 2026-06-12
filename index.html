@@ -234,6 +234,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <div class="site-title">Metroplan Quick Scan</div>
     <div class="site-sub">Hoe gezond is uw organisatie écht? — 10 minuten, eerlijk antwoord.</div>
   </div>
+  <button class="test-btn no-print" onclick="testInvullen()" title="Test met Frank Peeters / Ineos">⚡ Test</button>
 </div>
 
 <div class="progress-wrap no-print">
@@ -710,7 +711,7 @@ ${[...VERSNELLERS].sort((a,b)=>scores[a]-scores[b]).map(c=>domeinBlock(c,scores,
   <p>Bij een kop koffie bespreken we uw resultaten en de meest concrete volgende stap voor uw bedrijf. Geen verplichtingen — wél direct inzicht in waar de grootste winst te halen valt.</p>
   <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;justify-content:center">
     <button id="btn-gesprek-1" class="btn-gesprek" onclick="vraagGesprek('btn-gesprek-1')" style="background:#fff;color:#1A2E4A;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;cursor:pointer">📅 Plan een gratis gesprek</button>
-    <button id="btn-print" class="btn-gesprek" onclick="window._doPrint(this)" style="background:#fff;color:#1A2E4A;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;cursor:pointer">📄 Stuur me dit rapport door</button>
+    <button id="btn-print" onclick="window._doPrint(this)" style="background:#fff;color:#1A2E4A;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;cursor:pointer">📄 Stuur me dit rapport door</button>
     <a href="mailto:dirk@ariadnebvba.be?subject=Vraag%20over%20mijn%20Quick%20Scan%20-%20${encodeURIComponent(bedrijf)}" style="display:inline-block;background:transparent;color:#fff;text-decoration:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;border:1.5px solid rgba(255,255,255,.4)">✉️ Contacteer ons voor meer inlichtingen</a>
   </div>
   <div class="r-cta-sub" style="font-size:14px;color:#fff;margin-top:16px">Dirk Vander Eyken &nbsp;&middot;&nbsp; +32 468 13 79 78 &nbsp;&middot;&nbsp; <a href="https://www.thenextlevel.consulting" target="_blank" class="link-plain">www.thenextlevel.consulting</a></div>

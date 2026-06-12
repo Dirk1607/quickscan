@@ -1109,7 +1109,7 @@ ${topVers.map((code,idx)=>{
   <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px">Liever meteen verder? Wij bespreken uw resultaten graag.</div>
   <div style="font-size:14px;color:#93c5fd;margin-bottom:14px">Dirk Vander Eyken &nbsp;&middot;&nbsp; +32 468 13 79 78 &nbsp;&middot;&nbsp; <a href="mailto:dirk@ariadnebvba.be" class="link-plain" style="color:#93c5fd">dirk@ariadnebvba.be</a></div>
   <div style="display:flex;flex-wrap:wrap;gap:10px">
-    <a href="mailto:dirk@ariadnebvba.be?subject=Aanvraag%20gratis%20gesprek%20-%20${encodeURIComponent(bedrijf)}&body=Beste%20Dirk%2C%0A%0AIk%20heb%20de%20Metroplan%20Quick%20Scan%20ingevuld%20en%20wil%20graag%20een%20gratis%20gesprek%20plannen.%0A%0ANaam%3A%20${encodeURIComponent(naam)}%0ABedrijf%3A%20${encodeURIComponent(bedrijf)}%0A%0AMet%20vriendelijke%20groeten%2C%0A${encodeURIComponent(naam)}" style="display:inline-block;background:#fff;color:#1A2E4A;text-decoration:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700">📅 Plan een gratis gesprek</a>
+    <button id="btn-gesprek-2" class="btn-gesprek" onclick="vraagGesprek('btn-gesprek-2')" style="display:inline-block;background:#fff;color:#1A2E4A;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer">📅 Plan een gratis gesprek</button>
     <a href="mailto:dirk@ariadnebvba.be?subject=Vraag%20over%20mijn%20Quick%20Scan%20-%20${encodeURIComponent(bedrijf)}" style="display:inline-block;background:transparent;color:#fff;text-decoration:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;border:1.5px solid rgba(255,255,255,.4)">✉️ Meer inlichtingen</a>
   </div>
 </div>
@@ -1126,7 +1126,7 @@ ${[...VERSNELLERS].sort((a,b)=>scores[a]-scores[b]).map(c=>domeinBlock(c,scores,
   <h2>Klaar om de volgende stap te zetten?</h2>
   <p>Bij een kop koffie bespreken we uw resultaten en de meest concrete volgende stap voor uw bedrijf. Geen verplichtingen — wél direct inzicht in waar de grootste winst te halen valt.</p>
   <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;justify-content:center">
-    <a href="mailto:dirk@ariadnebvba.be?subject=Aanvraag%20gratis%20gesprek%20-%20${encodeURIComponent(bedrijf)}&body=Beste%20Dirk%2C%0A%0AIk%20heb%20de%20Metroplan%20Quick%20Scan%20ingevuld%20en%20wil%20graag%20een%20gratis%20gesprek%20plannen%20om%20de%20resultaten%20te%20bespreken.%0A%0ANaam%3A%20${encodeURIComponent(naam)}%0ABedrijf%3A%20${encodeURIComponent(bedrijf)}%0AFunctie%3A%20${encodeURIComponent(functie||'')}%0A%0AMet%20vriendelijke%20groeten%2C%0A${encodeURIComponent(naam)}" style="display:inline-block;background:#fff;color:#1A2E4A;text-decoration:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700">📅 Plan een gratis gesprek</a>
+    <button id="btn-gesprek-1" class="btn-gesprek" onclick="vraagGesprek('btn-gesprek-1')" style="background:#fff;color:#1A2E4A;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;cursor:pointer">📅 Plan een gratis gesprek</button>
     <button class="print-btn" onclick="window.print()" style="margin-top:0">📄 Stuur me dit rapport door</button>
     <a href="mailto:dirk@ariadnebvba.be?subject=Vraag%20over%20mijn%20Quick%20Scan%20-%20${encodeURIComponent(bedrijf)}" style="display:inline-block;background:transparent;color:#fff;text-decoration:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;border:1.5px solid rgba(255,255,255,.4)">✉️ Contacteer ons voor meer inlichtingen</a>
   </div>
@@ -1158,56 +1158,86 @@ function stuurNotificatie(naam,bedrijf,email,functie,mw,sector,scores,gem,gz){
     return DOMAINS[d]+': '+scores[d]+'/4 ('+p.lbl+')';
   }).join('\n');
 
-  // Print-indicator bijhouden
-  window._pdfAfgedrukt = false;
-  window.addEventListener('beforeprint', function(){
-    window._pdfAfgedrukt = true;
-  });
+  const telVal=document.getElementById('f-tel')?document.getElementById('f-tel').value.trim()||'Niet ingevuld':'Niet ingevuld';
+  const datumVal=new Date().toLocaleDateString('nl-BE',{day:'2-digit',month:'long',year:'numeric'});
 
-  // Mail 1: notificatie naar Dirk
+  // Mail 1: notificatie naar Dirk bij rapport genereren
   emailjs.send('TNL_Service','template_3ebr3lk',{
     to_name:'Dirk',
     to_email:'dirk@ariadnebvba.be',
-    naam:naam,
-    bedrijf:bedrijf,
-    from_email:email,
+    naam:naam, bedrijf:bedrijf, from_email:email,
     functie:functie||'Niet ingevuld',
     medewerkers:mw||'Niet ingevuld',
     sector:sector||'Niet ingevuld',
-    tel:document.getElementById('f-tel')?document.getElementById('f-tel').value.trim()||'Niet ingevuld':'Niet ingevuld',
-    score:gem+' / 4',
-    rapport:scoresTxt,
-    pdf_afgedrukt: 'Nog niet afgedrukt',
-    datum:new Date().toLocaleDateString('nl-BE',{day:'2-digit',month:'long',year:'numeric'})
+    tel:telVal, score:gem+' / 4', rapport:scoresTxt,
+    status:'📋 Rapport gegenereerd',
+    pdf_afgedrukt:'Nog niet afgedrukt',
+    datum:datumVal
   }).then(function(){
-    console.log('Notificatie verstuurd naar Dirk');
+    console.log('Notificatie verstuurd');
   },function(err){
-    console.log('EmailJS fout notificatie:',err);
+    console.log('EmailJS fout:',err);
   });
 
-  // Aparte mail sturen als ze afdrukken
+  // Mail bij afdrukken
   window.addEventListener('beforeprint', function(){
     if(window._pdfNotificatieGestuurd) return;
     window._pdfNotificatieGestuurd = true;
     emailjs.send('TNL_Service','template_3ebr3lk',{
-      to_name:'Dirk',
-      to_email:'dirk@ariadnebvba.be',
-      naam:naam,
-      bedrijf:bedrijf,
-      from_email:email,
+      to_name:'Dirk', to_email:'dirk@ariadnebvba.be',
+      naam:naam, bedrijf:bedrijf, from_email:email,
       functie:functie||'Niet ingevuld',
       medewerkers:mw||'Niet ingevuld',
       sector:sector||'Niet ingevuld',
-      tel:document.getElementById('f-tel')?document.getElementById('f-tel').value.trim()||'Niet ingevuld':'Niet ingevuld',
-      score:gem+' / 4',
-      rapport:scoresTxt,
-      pdf_afgedrukt: '✅ JA — rapport afgedrukt of opgeslagen als PDF',
-      datum:new Date().toLocaleDateString('nl-BE',{day:'2-digit',month:'long',year:'numeric'})
-    }).then(function(){
-      console.log('PDF notificatie verstuurd');
+      tel:telVal, score:gem+' / 4', rapport:scoresTxt,
+      status:'📄 PDF afgedrukt/opgeslagen',
+      pdf_afgedrukt:'✅ JA',
+      datum:datumVal
     });
   });
 
+  // Sla gegevens op voor gebruik door gesprek-knop
+  window._tnlData = {naam,bedrijf,email,functie:functie||'Niet ingevuld',
+    mw:mw||'Niet ingevuld',sector:sector||'Niet ingevuld',
+    tel:telVal,score:gem+' / 4',rapport:scoresTxt,datum:datumVal};
+}
+
+function vraagGesprek(btnId){
+  if(!window._tnlData){return;}
+  if(window._gesprekGestuurd) return;
+  window._gesprekGestuurd = true;
+
+  const btn=document.getElementById(btnId);
+  if(btn){btn.textContent='⏳ Versturen...';btn.disabled=true;btn.style.opacity='0.7';}
+
+  const d=window._tnlData;
+  emailjs.send('TNL_Service','template_3ebr3lk',{
+    to_name:'Dirk', to_email:'dirk@ariadnebvba.be',
+    naam:d.naam, bedrijf:d.bedrijf, from_email:d.email,
+    functie:d.functie, medewerkers:d.mw, sector:d.sector,
+    tel:d.tel, score:d.score, rapport:d.rapport,
+    status:'✅ GRATIS GESPREK AANGEVRAAGD',
+    pdf_afgedrukt:window._pdfNotificatieGestuurd?'Ja':'Nee',
+    datum:d.datum
+  }).then(function(){
+    // Bevestiging naar invuller
+    emailjs.send('TNL_Service','template_q79002p',{
+      naam:d.naam, bedrijf:d.bedrijf, from_email:d.email,
+      score:d.score, datum:d.datum
+    });
+    // Knop updaten
+    document.querySelectorAll('.btn-gesprek').forEach(function(b){
+      b.textContent='✅ Aanvraag verstuurd';
+      b.disabled=true;
+      b.style.background='#64748b';
+      b.style.cursor='default';
+    });
+    console.log('Gesprek aangevraagd');
+  },function(err){
+    if(btn){btn.textContent='❌ Fout — probeer opnieuw';btn.disabled=false;btn.style.opacity='1';}
+    window._gesprekGestuurd=false;
+    console.log('Fout:',err);
+  });
 }
 
 

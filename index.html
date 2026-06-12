@@ -1208,20 +1208,6 @@ function stuurNotificatie(naam,bedrijf,email,functie,mw,sector,scores,gem,gz){
     });
   });
 
-  // Mail 2: bevestiging naar invuller
-  if(email){
-    emailjs.send('TNL_Service','template_q79002p',{
-      naam:naam,
-      bedrijf:bedrijf,
-      from_email:email,
-      score:gem+' / 4',
-      datum:new Date().toLocaleDateString('nl-BE',{day:'2-digit',month:'long',year:'numeric'})
-    }).then(function(){
-      console.log('Bevestiging verstuurd naar '+email);
-    },function(err){
-      console.log('EmailJS fout bevestiging:',err);
-    });
-  }
 }
 
 

@@ -1109,7 +1109,7 @@ ${topVers.map((code,idx)=>{
   <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px">Liever meteen verder? Wij bespreken uw resultaten graag.</div>
   <div style="font-size:14px;color:#93c5fd;margin-bottom:14px">Dirk Vander Eyken &nbsp;&middot;&nbsp; +32 468 13 79 78 &nbsp;&middot;&nbsp; <a href="https://www.thenextlevel.consulting" target="_blank" class="link-plain" style="color:#93c5fd">www.thenextlevel.consulting</a></div>
   <div style="display:flex;flex-wrap:wrap;gap:10px">
-    <button id="btn-gesprek-2" class="btn-gesprek" onclick="vraagGesprek('btn-gesprek-2')" style="display:inline-block;background:#fff;color:#1A2E4A;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer">📅 Plan een gratis gesprek</button>
+    <button id="btn-gesprek-2" class="btn-gesprek" onclick="vraagGesprek('btn-gesprek-2')" style="display:inline-block;background:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;color:#1A2E4A">📅 Plan een gratis gesprek</button>
     <a href="mailto:dirk@ariadnebvba.be?subject=Vraag%20over%20mijn%20Quick%20Scan%20-%20${encodeURIComponent(bedrijf)}" style="display:inline-block;background:transparent;color:#fff;text-decoration:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;border:1.5px solid rgba(255,255,255,.4)">✉️ Meer inlichtingen</a>
   </div>
 </div>
@@ -1197,9 +1197,24 @@ function stuurNotificatie(naam,bedrijf,email,functie,mw,sector,scores,gem,gz){
   });
 
   // Sla gegevens op voor gebruik door gesprek-knop
-  window._tnlData = {naam,voornaam:naam.split(' ')[0],bedrijf,email,functie:functie||'Niet ingevuld',
+  const voornaam = naam.split(' ')[0];
+  const achternaam = naam.split(' ').slice(1).join(' ') || naam;
+
+  // Genderize.io API — bepaal geslacht op basis van voornaam
+  fetch('https://api.genderize.io/?name=' + encodeURIComponent(voornaam) + '&country_id=BE')
+    .then(function(r){ return r.json(); })
+    .then(function(g){
+      const geslacht = (g.gender === 'male') ? 'heer' : (g.gender === 'female') ? 'mevrouw' : 'heer/mevrouw';
+      window._tnlData = {naam, voornaam, achternaam, geslacht, bedrijf, email, functie:functie||'Niet ingevuld',
     mw:mw||'Niet ingevuld',sector:sector||'Niet ingevuld',
     tel:telVal,score:gem+' / 4',rapport:scoresTxt,datum:datumVal};
+    })
+    .catch(function(){
+      // Fallback bij geen internet of API fout
+      window._tnlData = {naam, voornaam, achternaam, geslacht:'heer/mevrouw', bedrijf, email, functie:functie||'Niet ingevuld',
+    mw:mw||'Niet ingevuld',sector:sector||'Niet ingevuld',
+    tel:telVal,score:gem+' / 4',rapport:scoresTxt,datum:datumVal};
+    });
 }
 
 function vraagGesprek(btnId){
@@ -1222,17 +1237,14 @@ function vraagGesprek(btnId){
   }).then(function(){
     // Bevestiging naar invuller
     emailjs.send('TNL_Service','template_q79002p',{
-      naam:d.naam, voornaam:d.voornaam, bedrijf:d.bedrijf, from_email:d.email,
+      naam:d.naam, voornaam:d.voornaam, achternaam:d.achternaam, geslacht:d.geslacht, bedrijf:d.bedrijf, from_email:d.email,
       score:d.score, datum:d.datum
     });
     // Knop updaten
     document.querySelectorAll('.btn-gesprek').forEach(function(b){
       b.textContent='✅ Aanvraag verstuurd';
       b.disabled=true;
-      b.style.background='#00C850';
-      b.style.color='#fff';
-      b.style.border='none';
-      b.style.cursor='default';
+      b.setAttribute('style', b.getAttribute('style').replace(/color:[^;]+;?/g,'') + ';background:#00C850;color:#fff;cursor:default;border:none;');
     });
     console.log('Gesprek aangevraagd');
   },function(err){

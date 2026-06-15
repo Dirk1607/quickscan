@@ -228,6 +228,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <body>
 <div class="container">
 
+<div style="position:sticky;top:0;z-index:100;background:#f0f4f8;margin:-24px -16px 0;padding:24px 16px 0;">
 <div class="site-header">
   <img src="LogoNextLevel_FINAAL.jpg" alt="The Next Level" style="height:90px;width:auto;max-width:260px;display:block;flex-shrink:0" onerror="this.parentElement.innerHTML='<div class=\'logo-fallback\'><span>The<br>Next<br>Level</span></div>'">
   <div>
@@ -239,6 +240,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="progress-wrap no-print">
   <div class="progress-track"><div class="progress-fill" id="prog" style="width:0%"></div></div>
   <div class="progress-label"><span id="prog-label">Introductie</span><span id="prog-pct">0%</span></div>
+</div>
 </div>
 
 <!-- STAP 0: Intro -->
@@ -398,16 +400,15 @@ const scoreVals=new Array(30).fill(0);
 let currentStep=0;
 
 function buildBlocks(){
+  const el=document.getElementById('step-1');
+  let html='';
   for(let b=0;b<6;b++){
-    const el=document.getElementById('step-'+(b+1));
     const start=b*5;
-    let html=`<div class="card"><div class="blok-header"><div class="blok-label">${BLOKKEN[b]}</div></div>
-`;
+    html+='<div class="card">';
     for(let i=start;i<start+5;i++){
       const v=VRAGEN[i];
       html+=`<div class="q-card" id="qc-${i}">
-  <div class="q-num">Vraag ${i+1} van 30</div>
-  <div class="q-text">${v.t}</div>
+  <div class="q-text"><span class="q-num" style="white-space:nowrap">${i+1}/30 &nbsp;</span>${v.t}</div>
   <div class="ans-row">
     <button class="ans-btn" onclick="setAns(${i},1,${v.inv?4:1},this,${v.inv})" data-q="${i}">Helemaal niet akkoord</button>
     <button class="ans-btn" onclick="setAns(${i},2,${v.inv?3:2},this,${v.inv})" data-q="${i}">Niet akkoord</button>
@@ -416,13 +417,23 @@ function buildBlocks(){
   </div>
 </div>`;
     }
-    html+=`<div class="nav-row">
-  <button class="btn" onclick="goStep(${b})">&larr; Vorige</button>
-  <span class="q-count">Blok ${b+1} van 6</span>
-  <button class="btn btn-primary" onclick="nextBlock(${b+1})">${b===5?'Bekijk mijn rapport &rarr;':'Volgende &rarr;'}</button>
-</div></div>`;
-    el.innerHTML=html;
+    html+='</div>';
   }
+  html+=`<div class="nav-row"><button class="btn" onclick="goStep(0)">&larr; Terug</button><button class="btn btn-primary" onclick="submitAlleVragen()">Bekijk mijn rapport &rarr;</button></div>`;
+  el.innerHTML=html;
+}
+
+function submitAlleVragen(){
+  for(let i=0;i<30;i++){
+    if(!rawAns[i]){
+      showMelding('Beantwoord alle vragen voor u verdergaat.');
+      const card=document.getElementById('qc-'+i);
+      if(card)card.scrollIntoView({behavior:'smooth',block:'center'});
+      return;
+    }
+  }
+  buildRapport();
+  goStep(7);
 }
 
 function setAns(qi,raw,sv,btn){
@@ -431,6 +442,10 @@ function setAns(qi,raw,sv,btn){
   btn.className='ans-btn '+['sel-nooit','sel-zelden','sel-vaak','sel-altijd'][sv-1];
   const card=document.getElementById('qc-'+qi);
   if(card)card.classList.add('answered');
+  const answered=rawAns.filter(a=>a>0).length;
+  const pct=Math.round(answered/30*100);
+  document.getElementById('prog').style.width=pct+'%';
+  document.getElementById('prog-pct').textContent=pct+'%';
 }
 
 function goStep(n){
@@ -441,10 +456,10 @@ function goStep(n){
   document.getElementById('step-'+currentStep).classList.remove('active');
   currentStep=n;
   document.getElementById('step-'+n).classList.add('active');
-  const pct=Math.round(n/7*100);
+  const pct=n===0?0:n===7?100:0;
   document.getElementById('prog').style.width=pct+'%';
   document.getElementById('prog-pct').textContent=pct+'%';
-  document.getElementById('prog-label').textContent=n===0?'Introductie':n===7?'Rapport klaar':'Blok '+n+' van 6';
+  document.getElementById('prog-label').textContent=n===0?'Introductie':n===7?'Rapport klaar':'30 vragen';
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -475,7 +490,7 @@ function nextBlock(b){
   const start=(b-1)*5;
   for(let i=start;i<start+5;i++){
     if(!rawAns[i]){
-      alert('Beantwoord alle vragen in dit blok voor u verdergaat.');
+      showMelding('Beantwoord alle vragen voor u verdergaat.');
       return;
     }
   }
@@ -1045,25 +1060,49 @@ function toggleExtra(id,el){
 <script>
 window.addEventListener('beforeprint', function(){
   document.title = ' ';
-  // Alle fades openen
   document.querySelectorAll('.r-fade-wrap').forEach(function(el){
+    el.setAttribute('data-was-fade','1');
     el.classList.remove('r-fade-wrap');
     el.style.maxHeight='none';
     el.style.overflow='visible';
   });
-  // Methode uitleg tonen
   var m=document.getElementById('methode-uitleg');
   if(m) m.style.display='block';
   var mp=document.getElementById('methode-preview');
   if(mp){mp.style.maxHeight='none';mp.style.overflow='visible';}
-  // Alle r-extra uitklappen
   document.querySelectorAll('.r-extra').forEach(function(el){
     el.style.display='block';
   });
 });
 window.addEventListener('afterprint', function(){
   document.title = 'Quick Scan';
+  document.querySelectorAll('[data-was-fade]').forEach(function(el){
+    el.removeAttribute('data-was-fade');
+    el.classList.add('r-fade-wrap');
+    el.style.maxHeight='3.2em';
+    el.style.overflow='hidden';
+  });
+  document.querySelectorAll('.r-extra').forEach(function(el){
+    el.style.display='';
+  });
+  var m=document.getElementById('methode-uitleg');
+  if(m) m.style.display='none';
+  var rapportTop=document.getElementById('rapport-content');
+  if(rapportTop) rapportTop.scrollIntoView({behavior:'smooth',block:'start'});
 });
+</script>
+
+<div id="melding-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:12px;padding:28px 32px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18);text-align:center">
+    <p id="melding-tekst" style="font-size:15px;color:#1e293b;margin-bottom:20px;line-height:1.5"></p>
+    <button onclick="document.getElementById('melding-overlay').style.display='none'" style="background:#1A2E4A;color:#fff;border:none;border-radius:8px;padding:10px 28px;font-size:15px;cursor:pointer">OK</button>
+  </div>
+</div>
+<script>
+function showMelding(tekst){
+  document.getElementById('melding-tekst').textContent=tekst;
+  document.getElementById('melding-overlay').style.display='flex';
+}
 </script>
 </body>
 </html>

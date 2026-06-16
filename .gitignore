@@ -5,3 +5,5 @@ TNL_Kennisbank_64Profielen*.xlsx
 TNL_QuickScan_Opvolging*.xlsm
 index (3).html
 ~$*
+start-server.bat
+deploy.bat

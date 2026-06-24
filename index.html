@@ -851,7 +851,8 @@ function vraagGesprek(btnId){
   }
   window._gesprekWacht=0;
   window._gesprekGestuurd = true;
-  if(btn){btn.textContent='⏳ Versturen...';btn.disabled=true;btn.style.opacity='0.7';}
+  // beide knoppen reageren meteen
+  document.querySelectorAll('.btn-gesprek').forEach(function(b){ b.textContent='⏳ Versturen...'; b.style.opacity='0.7'; });
 
   const d=window._tnlData;
   emailjs.send('TNL_Service','template_3ebr3lk',{
@@ -868,15 +869,18 @@ function vraagGesprek(btnId){
       naam:d.naam, voornaam:d.voornaam, achternaam:d.achternaam, geslacht:d.geslacht, bedrijf:d.bedrijf, from_email:d.email,
       score:d.score, datum:d.datum
     });
-    // Knop updaten
+    // Beide knoppen groen = "aangevraagd"; ze blijven klikbaar (nog eens drukken doet niets dankzij _gesprekGestuurd)
     document.querySelectorAll('.btn-gesprek').forEach(function(b){
       b.textContent='✅ Aanvraag verstuurd';
-      b.disabled=true;
-      b.setAttribute('style','background:#00C850 !important;color:#fff !important;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:default;display:inline-block;');
+      b.disabled=false;
+      b.style.opacity='1';
+      b.style.background='#00C850';
+      b.style.color='#fff';
+      b.style.cursor='pointer';
     });
     console.log('Gesprek aangevraagd');
   },function(err){
-    if(btn){btn.textContent='❌ Fout, probeer opnieuw';btn.disabled=false;btn.style.opacity='1';}
+    document.querySelectorAll('.btn-gesprek').forEach(function(b){ b.textContent='❌ Fout, probeer opnieuw'; b.disabled=false; b.style.opacity='1'; });
     window._gesprekGestuurd=false;
     console.log('Fout:',err);
   });

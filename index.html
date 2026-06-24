@@ -624,12 +624,12 @@ function buildRapport(){
 
 <!-- Methodologie uitleg -->
 <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:18px 20px;margin-bottom:20px">
-  <div class="r-fade-wrap" id="methode-preview" style="max-height:4.8em;overflow:hidden;position:relative">
+  <div id="methode-preview">
     <p style="font-size:13px;color:#334155;line-height:1.6;margin:0">
       The Next Level werkt met een visuele methodiek die de werking van een organisatie vergelijkt met een <strong>metroplan</strong>: een netwerk van lijnen en stations, elk met een eigen domein en rijpheidsgraad. Zo krijg je in één oogopslag een helder beeld van waar uw organisatie sterk staat en waar groeikansen liggen.
     </p>
   </div>
-  <button onclick="toggleMethode()" id="btn-methode" class="no-print" style="background:none;border:none;color:#0078FF;font-size:13px;font-weight:600;cursor:pointer;padding:0;margin-top:6px">... Meer info ▼</button>
+  <button onclick="toggleMethode()" id="btn-methode" class="no-print" style="background:none;border:none;color:#0078FF;font-size:13px;font-weight:600;cursor:pointer;padding:0;margin-top:6px">Meer info ▼</button>
   <div id="methode-uitleg" style="display:none;margin-top:14px;border-top:1px solid #e2e8f0;padding-top:14px">
     <p style="font-size:13px;color:#334155;line-height:1.7;margin-bottom:12px">
       Dit rapport is opgebouwd uit <strong>twee delen</strong>:
@@ -1007,15 +1007,12 @@ function tekenRadar(canvasId, labels, data, kleur){
 function toggleMethode(){
   const d=document.getElementById('methode-uitleg');
   const b=document.getElementById('btn-methode');
-  const preview=document.getElementById('methode-preview');
   if(d.style.display==='none'){
     d.style.display='block';
     b.textContent='Sluiten ▲';
-    if(preview){preview.style.maxHeight='none';preview.style.overflow='visible';preview.classList.remove('r-fade-wrap');}
   } else {
     d.style.display='none';
-    b.textContent='... Meer info ▼';
-    if(preview){preview.style.maxHeight='4.8em';preview.style.overflow='hidden';preview.classList.add('r-fade-wrap');}
+    b.textContent='Meer info ▼';
   }
 }
 

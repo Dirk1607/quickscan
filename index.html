@@ -766,8 +766,29 @@ ${[...VERSNELLERS].sort((a,b)=>scores[a]-scores[b]).map(c=>domeinBlock(c,scores,
   }
 })();
 
+// ── TESTMODUS ──────────────────────────────────────────────────
+// Actief bij ?test=1 in de URL, of lokaal (file:// / localhost).
+// Dan worden er GEEN mails verstuurd (geen EmailJS-credits); alles wat
+// je visueel wil testen (scan, rapport, knoppen, feedback) werkt gewoon.
+window._TESTMODE = /[?&]test=1/.test(location.search) || location.protocol==='file:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+function _mailSend(){
+  if(window._TESTMODE){
+    console.log('[TESTMODUS] mail NIET verstuurd:', arguments[1], arguments[2]);
+    return Promise.resolve({status:200,text:'TESTMODUS'});
+  }
+  return emailjs.send.apply(emailjs, arguments);
+}
+if(window._TESTMODE){
+  window.addEventListener('DOMContentLoaded',function(){
+    var b=document.createElement('div');
+    b.textContent='🧪 TESTMODUS — er worden geen mails verstuurd';
+    b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:#b45309;color:#fff;text-align:center;font-size:12px;font-weight:700;padding:5px 10px;font-family:sans-serif';
+    document.body.appendChild(b);
+  });
+}
+
 function stuurNotificatie(naam,bedrijf,email,functie,mw,sector,scores,gem,gz){
-  if(typeof emailjs==='undefined'||!emailjs.send)return;
+  if(!window._TESTMODE && (typeof emailjs==='undefined'||!emailjs.send))return;
   const scoresTxt=Object.keys(DOMAINS).map(d=>{
     const z=getZone(scores[d]);
     const p=getProfiel(d,z);
@@ -778,7 +799,7 @@ function stuurNotificatie(naam,bedrijf,email,functie,mw,sector,scores,gem,gz){
   const datumVal=new Date().toLocaleDateString('nl-BE',{day:'2-digit',month:'long',year:'numeric'});
 
   // Mail 1: notificatie naar Dirk bij rapport genereren
-  emailjs.send('TNL_Service','template_3ebr3lk',{
+  _mailSend('TNL_Service','template_3ebr3lk',{
     to_name:'Dirk',
     to_email:'dirk@ariadnebvba.be',
     naam:naam, bedrijf:bedrijf, from_email:email,
@@ -799,7 +820,7 @@ function stuurNotificatie(naam,bedrijf,email,functie,mw,sector,scores,gem,gz){
   window.addEventListener('beforeprint', function(){
     if(window._pdfNotificatieGestuurd) return;
     window._pdfNotificatieGestuurd = true;
-    emailjs.send('TNL_Service','template_3ebr3lk',{
+    _mailSend('TNL_Service','template_3ebr3lk',{
       to_name:'Dirk', to_email:'dirk@ariadnebvba.be',
       naam:naam, bedrijf:bedrijf, from_email:email,
       functie:functie||'Niet ingevuld',
@@ -854,7 +875,7 @@ function vraagGesprek(btnId){
   if(btn){btn.textContent='⏳ Versturen...';btn.disabled=true;btn.style.opacity='0.7';}
 
   const d=window._tnlData;
-  emailjs.send('TNL_Service','template_3ebr3lk',{
+  _mailSend('TNL_Service','template_3ebr3lk',{
     to_name:'Dirk', to_email:'dirk@ariadnebvba.be',
     naam:d.naam, bedrijf:d.bedrijf, from_email:d.email,
     functie:d.functie, medewerkers:d.mw, sector:d.sector,
@@ -864,7 +885,7 @@ function vraagGesprek(btnId){
     datum:d.datum
   }).then(function(){
     // Bevestiging naar invuller
-    emailjs.send('TNL_Service','template_q79002p',{
+    _mailSend('TNL_Service','template_q79002p',{
       naam:d.naam, voornaam:d.voornaam, achternaam:d.achternaam, geslacht:d.geslacht, bedrijf:d.bedrijf, from_email:d.email,
       score:d.score, datum:d.datum
     });

@@ -904,15 +904,20 @@ function vraagGesprek(btnId){
 }
 
 function window_doPrint(btn){
-  // knop blijft stabiel (geen kleurflikker); toon korte uitleg eronder
-  setTimeout(function(){ window.print(); }, 100);
-  if(btn._hint && btn._hint.parentNode) return;
-  var hint=document.createElement('div');
-  hint.textContent='📄 Het printvenster wordt geopend. Kies daar "Opslaan als PDF" om het rapport te bewaren.';
-  hint.style.cssText='width:100%;margin-top:8px;font-size:12px;font-weight:600;color:#fff;background:rgba(255,255,255,.15);padding:7px 12px;border-radius:8px';
-  btn.insertAdjacentElement('afterend',hint);
-  btn._hint=hint;
-  setTimeout(function(){ if(hint.parentNode){hint.parentNode.removeChild(hint);} btn._hint=null; }, 8000);
+  // 1) toon de uitleg METEEN (en open het printvenster pas na ~1s, anders dekt het de melding af)
+  if(!(btn._hint && btn._hint.parentNode)){
+    var hint=document.createElement('div');
+    hint.textContent='📄 Het printvenster wordt geopend. Kies daar "Opslaan als PDF" om het rapport te bewaren.';
+    hint.style.cssText='width:100%;margin-top:8px;font-size:12px;font-weight:600;color:#fff;background:rgba(255,255,255,.15);padding:7px 12px;border-radius:8px';
+    btn.insertAdjacentElement('afterend',hint);
+    btn._hint=hint;
+    setTimeout(function(){ if(hint.parentNode){hint.parentNode.removeChild(hint);} btn._hint=null; }, 9000);
+  }
+  // 2) bewaar de scrollpositie en herstel ze zodra het printvenster sluit (anders springt het rapport naar boven)
+  var y=window.scrollY||window.pageYOffset||0;
+  function _restore(){ window.scrollTo(0,y); window.removeEventListener('afterprint',_restore); }
+  window.addEventListener('afterprint',_restore);
+  setTimeout(function(){ window.print(); }, 1100);
 }
 window._doPrint = window_doPrint;
 

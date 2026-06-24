@@ -197,17 +197,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .metro-section{margin-bottom:8px}
 .metro-wrap{position:relative;display:block;width:100%;max-width:986px;margin:0 auto}
 .metro-wrap img{display:block;width:100%;height:auto;border-radius:var(--radius);box-shadow:0 2px 10px rgba(0,0,0,.10)}
+/* witte sluier over de kaart zodat de dots eruit springen */
+.metro-veil{position:absolute;inset:0;border-radius:var(--radius);background:rgba(255,255,255,.62);pointer-events:none;z-index:1}
+/* logo-hoek niet verbleken: onverbleekte kopie bovenop de sluier, bijgeknipt tot enkel het logo */
+.metro-logo{position:absolute;top:0;left:0;width:100%;height:auto;z-index:2;pointer-events:none;border-radius:var(--radius);
+  clip-path:inset(0% 0% 88.3% 69.3%);}
 .metro-legend{display:flex;gap:10px;padding:9px 14px;background:rgba(255,255,255,.85);border-radius:8px;margin-bottom:10px;flex-wrap:wrap;justify-content:center;font-size:11px;font-weight:600}
 .metro-leg{display:flex;align-items:center;gap:6px;color:#1e293b}
-.metro-leg-dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;border:2px solid rgba(255,255,255,.6);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.metro-leg-dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .mdot{
   position:absolute;
   transform:translate(-50%,-50%);
   border-radius:50%;
-  width:clamp(28px,3.6vw,44px);
-  height:clamp(28px,3.6vw,44px);
+  width:clamp(34px,4.6vw,56px);
+  height:clamp(34px,4.6vw,56px);
   display:flex;align-items:center;justify-content:center;
-  border:3px solid rgba(255,255,255,0.55);
   box-shadow:0 2px 10px rgba(0,0,0,0.28);
   cursor:pointer;
   transition:transform .18s ease,box-shadow .18s ease;
@@ -216,7 +220,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 }
 .mdot:hover{transform:translate(-50%,-50%) scale(1.16);box-shadow:0 4px 18px rgba(0,0,0,.36);z-index:20}
 .mdot-lbl{
-  font-size:clamp(5.5px,.65vw,8px);
+  font-size:clamp(6.5px,.8vw,10px);
   font-weight:800;color:#fff;
   text-align:center;line-height:1.15;
   letter-spacing:-.3px;
@@ -656,22 +660,24 @@ function buildRapport(){
   </div>
   <div class="metro-wrap" id="metroWrap">
     <img src="MetroplanSimpel.jpg" alt="Metroplan The Next Level">
+    <div class="metro-veil"></div>
+    <img class="metro-logo" src="MetroplanSimpel.jpg" alt="" aria-hidden="true">
     <div class="mdot" id="mdot-STR" style="left:71.7%;top:49.6%" data-code="STR" data-full="Strategie"><span class="mdot-lbl">STR</span></div>
-    <div class="mdot" id="mdot-PROD" style="left:9.9%;top:52.9%" data-code="PROD" data-full="Product"><span class="mdot-lbl">PROD</span></div>
-    <div class="mdot" id="mdot-MKT" style="left:10.4%;top:76.5%" data-code="MKT" data-full="Marketing"><span class="mdot-lbl">MKT</span></div>
-    <div class="mdot" id="mdot-SAL" style="left:18.9%;top:85.3%" data-code="SAL" data-full="Sales"><span class="mdot-lbl">SAL</span></div>
-    <div class="mdot" id="mdot-OPS" style="left:56.9%;top:63.2%" data-code="OPS" data-full="Operations"><span class="mdot-lbl">OPS</span></div>
-    <div class="mdot" id="mdot-AFS" style="left:72.5%;top:68.7%" data-code="AFS" data-full="After Sales"><span class="mdot-lbl">AFS</span></div>
-    <div class="mdot" id="mdot-HR" style="left:39.0%;top:58.7%" data-code="HR" data-full="HR"><span class="mdot-lbl">HR</span></div>
+    <div class="mdot" id="mdot-PROD" style="left:18.9%;top:52.9%" data-code="PROD" data-full="Product"><span class="mdot-lbl">PROD</span></div>
+    <div class="mdot" id="mdot-MKT" style="left:18.7%;top:74.8%" data-code="MKT" data-full="Marketing"><span class="mdot-lbl">MKT</span></div>
+    <div class="mdot" id="mdot-SAL" style="left:19%;top:88.9%" data-code="SAL" data-full="Sales"><span class="mdot-lbl">SAL</span></div>
+    <div class="mdot" id="mdot-OPS" style="left:60.3%;top:74.8%" data-code="OPS" data-full="Operations"><span class="mdot-lbl">OPS</span></div>
+    <div class="mdot" id="mdot-AFS" style="left:72%;top:69.5%" data-code="AFS" data-full="After Sales"><span class="mdot-lbl">AFS</span></div>
+    <div class="mdot" id="mdot-HR" style="left:41.7%;top:59.5%" data-code="HR" data-full="HR"><span class="mdot-lbl">HR</span></div>
     <div class="mdot" id="mdot-FIN" style="left:60.3%;top:43.8%" data-code="FIN" data-full="Finance"><span class="mdot-lbl">FIN</span></div>
-    <div class="mdot" id="mdot-IT" style="left:42.1%;top:35.3%" data-code="IT" data-full="IT"><span class="mdot-lbl">IT</span></div>
-    <div class="mdot" id="mdot-QUA" style="left:80.0%;top:42.6%" data-code="QUA" data-full="Kwaliteit"><span class="mdot-lbl">QUA</span></div>
-    <div class="mdot" id="mdot-SAF" style="left:89.7%;top:42.3%" data-code="SAF" data-full="Veiligheid"><span class="mdot-lbl">SAF</span></div>
-    <div class="mdot" id="mdot-PROC" style="left:27.6%;top:22.0%" data-code="PROC" data-full="Proces Mgmt"><span class="mdot-lbl">PROC</span></div>
-    <div class="mdot" id="mdot-PM" style="left:27.4%;top:32.6%" data-code="PM" data-full="Project Mgmt"><span class="mdot-lbl">PM</span></div>
-    <div class="mdot" id="mdot-LEAD" style="left:24.4%;top:62.5%" data-code="LEAD" data-full="Leadership"><span class="mdot-lbl">LEAD</span></div>
-    <div class="mdot" id="mdot-CHG" style="left:24.5%;top:74.7%" data-code="CHG" data-full="Change Mgmt"><span class="mdot-lbl">CHG</span></div>
-    <div class="mdot" id="mdot-OWN" style="left:53.6%;top:74.8%" data-code="OWN" data-full="Ownership"><span class="mdot-lbl">OWN</span></div>
+    <div class="mdot" id="mdot-IT" style="left:41.1%;top:35.4%" data-code="IT" data-full="IT"><span class="mdot-lbl">IT</span></div>
+    <div class="mdot" id="mdot-QUA" style="left:80.2%;top:38.4%" data-code="QUA" data-full="Kwaliteit"><span class="mdot-lbl">QUA</span></div>
+    <div class="mdot" id="mdot-SAF" style="left:90.9%;top:38.6%" data-code="SAF" data-full="Veiligheid"><span class="mdot-lbl">SAF</span></div>
+    <div class="mdot" id="mdot-PROC" style="left:28.8%;top:17.3%" data-code="PROC" data-full="Proces Mgmt"><span class="mdot-lbl">PROC</span></div>
+    <div class="mdot" id="mdot-PM" style="left:28.8%;top:32.4%" data-code="PM" data-full="Project Mgmt"><span class="mdot-lbl">PM</span></div>
+    <div class="mdot" id="mdot-LEAD" style="left:29.1%;top:59.9%" data-code="LEAD" data-full="Leadership"><span class="mdot-lbl">LEAD</span></div>
+    <div class="mdot" id="mdot-CHG" style="left:29.2%;top:74.4%" data-code="CHG" data-full="Change Mgmt"><span class="mdot-lbl">CHG</span></div>
+    <div class="mdot" id="mdot-OWN" style="left:41.7%;top:74.4%" data-code="OWN" data-full="Ownership"><span class="mdot-lbl">OWN</span></div>
   </div>
 </div>
 
@@ -889,9 +895,8 @@ function updateMetroplan(scores){
     const sc=scores[code];
     const zone=getZone(sc);
     const [r,g,b]=METRO_ZONE_COLORS[zone];
-    const alpha=zone===0?0.45:0.78;
+    const alpha=zone===0?0.45:0.85;
     dot.style.background=`rgba(${r},${g},${b},${alpha})`;
-    dot.style.borderColor=`rgba(${r},${g},${b},0.95)`;
     const scoreStr=sc!=null?` — ${sc.toFixed(1)}/4`:'';
     dot.setAttribute('data-full',`${DOMAINS[code]}${scoreStr} (${METRO_ZONE_LABELS[zone]})`);
   });

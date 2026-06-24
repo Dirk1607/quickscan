@@ -353,16 +353,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </div>
 <script>
 const VRAGEN=[
-  {t:"Het bedrijf is té afhankelijk van enkele sleutelfiguren en te veel vragen komen bij dezelfde mensen terecht.",d:["HR","OPS","OWN"],inv:true},
-  {t:"Ik vaar blind als het over marges, cash of rendabiliteit gaat.",d:["FIN","STR"],inv:true},
+  {t:"Beslissingen en vragen worden in ons bedrijf te weinig gedelegeerd: ze belanden steeds opnieuw bij dezelfde personen of bij de directie.",d:["OWN","LEAD","HR"],inv:true},
+  {t:"Ik heb onvoldoende zicht op de marges, cashpositie en rendabiliteit van het bedrijf.",d:["FIN","STR"],inv:true},
   {t:"Onze huidige manier van werken kan de groei van het bedrijf niet meer aan.",d:["OPS","HR","PROC"],inv:true},
   {t:"Problemen tussen afdelingen kosten ons meer energie dan we zouden willen.",d:["OPS","HR","LEAD"],inv:true},
-  {t:"Verbeteringsinitiatieven worden omgezet naar projecten.",d:["PM","CHG","PROC"],inv:false},
+  {t:"Wij zetten verbeterinitiatieven om in concrete projecten en ronden die af binnen de afgesproken tijd en budget.",d:["PM","PROC","CHG"],inv:false},
   {t:"Nieuwe medewerkers vinden snel hun weg om te begrijpen hoe systemen, processen en klantenwerking in elkaar zitten.",d:["PROC","HR","IT"],inv:false},
-  {t:"Onze leidinggevenden krijgen mensen mee zonder constant te moeten trekken.",d:["LEAD","HR","CHG"],inv:false},
+  {t:"Onze leidinggevenden houden hun team gemotiveerd en betrokken, zonder voortdurend te moeten aansturen.",d:["LEAD","HR","CHG"],inv:false},
   {t:"Mensen weten duidelijk wat van hen verwacht wordt en aan wie zij rapporteren.",d:["HR","PROC","OWN"],inv:false},
   {t:"We zijn brandjes aan het blussen in plaats van de oorzaak aan te pakken.",d:["OPS","STR","PROC"],inv:true},
-  {t:"Verbeterprojecten worden bij ons afgewerkt binnen de deadline en budget.",d:["PM","OPS","CHG"],inv:false},
   {t:"We verliezen klanten door interne chaos, opvolgingsproblemen of gebrekkige communicatie.",d:["AFS","OPS","QUA"],inv:true},
   {t:"We weten precies welke klanten, producten, diensten of marktsegmenten geld opbrengen.",d:["FIN","SAL","MKT"],inv:false},
   {t:"Wanneer we cijfers, klantinformatie of operationele data nodig hebben, vinden we die zonder veel zoekwerk.",d:["IT","FIN","PROC"],inv:false},
@@ -374,15 +373,16 @@ const VRAGEN=[
   {t:"We verliezen energie en tijd aan interne discussies over prioriteiten en beslissingen.",d:["STR","LEAD","PM"],inv:true},
   {t:"We kunnen snel schakelen wanneer klanten, technologie of de markt veranderen.",d:["PROD","STR","IT"],inv:false},
   {t:"Het is voor onze medewerkers duidelijk waar het bedrijf naartoe wil.",d:["STR","HR","LEAD"],inv:false},
-  {t:"Onze commerciële opportuniteiten ontstaan via toeval of enkele vaste klanten.",d:["SAL","MKT","STR"],inv:true},
+  {t:"We hebben een actieve, gestructureerde aanpak om nieuwe klanten aan te trekken.",d:["SAL","MKT","STR"],inv:false},
+  {t:"Onze omzet is voldoende gespreid over meerdere klanten, zodat het wegvallen van één klant ons niet ernstig treft.",d:["FIN","SAL","STR"],inv:false},
   {t:"We slagen erin om verantwoordelijkheden en beslissingen laag in de organisatie te leggen.",d:["OWN","HR","LEAD"],inv:false},
   {t:"Iedereen volgt de procedures, systemen en klantaanpak.",d:["PROC","IT","QUA"],inv:false},
-  {t:"We worden verrast door problemen, incidenten of risico's die we hadden kunnen zien aankomen.",d:["SAF","QUA","OWN"],inv:true},
-  {t:"Veiligheid, kwaliteit en duidelijke afspraken worden bewaakt vóór er problemen ontstaan.",d:["SAF","QUA","PROC"],inv:false},
-  {t:"Meer mensen in dienst hebben, vergroot de complexiteit in ons bedrijf.",d:["HR","OPS","LEAD"],inv:true},
+  {t:"We bewaken kwaliteit, veiligheid en afspraken proactief, zodat problemen zelden onverwacht opduiken.",d:["SAF","QUA","PROC"],inv:false},
+  {t:"Elke uitbreiding van het team leidt tot merkbaar meer interne afstemming en dat vertraagt ons.",d:["HR","OPS","LEAD"],inv:true},
   {t:"Ons managementteam trekt in dezelfde richting en heeft een gezamenlijk beeld van waar het bedrijf naartoe wil.",d:["STR","LEAD","CHG"],inv:false},
-  {t:"Te veel beslissingen en vragen komen uiteindelijk nog bij de directie terecht, ook wanneer anderen die zouden kunnen opnemen.",d:["OWN","LEAD","HR"],inv:true},
-  {t:"We weten precies waar in het bedrijf geld verloren gaat.",d:["FIN","OPS","PROC"],inv:false}
+  {t:"We weten precies waar in het bedrijf geld verloren gaat.",d:["FIN","OPS","PROC"],inv:false},
+  {t:"We weten duidelijk waarop wij ons onderscheiden van concurrenten en welke waarde we bieden aan onze klanten.",d:["STR","MKT","SAL"],inv:false},
+  {t:"Onze IT-systemen en digitale tools ondersteunen onze werking effectief; handmatige omwegen en workarounds zijn eerder uitzondering dan regel.",d:["IT","PROC"],inv:false}
 ];
 
 const DOMAINS={

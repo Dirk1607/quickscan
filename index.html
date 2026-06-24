@@ -726,7 +726,7 @@ ${topVers.map((code,idx)=>{
   <div style="font-size:14px;color:#93c5fd;margin-bottom:14px">Dirk Vander Eyken &nbsp;&middot;&nbsp; +32 468 13 79 78 &nbsp;&middot;&nbsp; <a href="https://www.thenextlevel.consulting" target="_blank" class="link-plain" style="color:#93c5fd">www.thenextlevel.consulting</a></div>
   <div style="display:flex;flex-wrap:wrap;gap:10px">
     <button id="btn-gesprek-2" class="btn-gesprek" onclick="vraagGesprek('btn-gesprek-2')" style="display:inline-block;background:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;color:#1A2E4A">✉️ Ik wil graag een vrijblijvend gesprek</button>
-    <a href="mailto:dirk@ariadnebvba.be?subject=Vraag%20over%20mijn%20Quick%20Scan%20-%20${encodeURIComponent(bedrijf)}" style="display:inline-block;background:transparent;color:#fff;text-decoration:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;border:1.5px solid rgba(255,255,255,.4)">✉️ Meer inlichtingen</a>
+    <a href="mailto:dirk@ariadnebvba.be?subject=Vraag%20over%20mijn%20Quick%20Scan%20-%20${encodeURIComponent(bedrijf)}" onclick="meerInlichtingen(this)" style="display:inline-block;background:transparent;color:#fff;text-decoration:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;border:1.5px solid rgba(255,255,255,.4)">✉️ Meer inlichtingen</a>
   </div>
 </div>
 
@@ -744,7 +744,7 @@ ${[...VERSNELLERS].sort((a,b)=>scores[a]-scores[b]).map(c=>domeinBlock(c,scores,
   <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;justify-content:center">
     <button id="btn-gesprek-1" class="btn-gesprek" onclick="vraagGesprek('btn-gesprek-1')" style="background:#fff;color:#1A2E4A;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;cursor:pointer">✉️ Ik wil graag een vrijblijvend gesprek</button>
     <button id="btn-print" onclick="window._doPrint(this)" style="background:#fff;color:#1A2E4A;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;cursor:pointer">📄 Stuur me dit rapport door</button>
-    <a href="mailto:dirk@ariadnebvba.be?subject=Vraag%20over%20mijn%20Quick%20Scan%20-%20${encodeURIComponent(bedrijf)}" style="display:inline-block;background:transparent;color:#fff;text-decoration:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;border:1.5px solid rgba(255,255,255,.4)">✉️ Contacteer ons voor meer inlichtingen</a>
+    <a href="mailto:dirk@ariadnebvba.be?subject=Vraag%20over%20mijn%20Quick%20Scan%20-%20${encodeURIComponent(bedrijf)}" onclick="meerInlichtingen(this)" style="display:inline-block;background:transparent;color:#fff;text-decoration:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;border:1.5px solid rgba(255,255,255,.4)">✉️ Contacteer ons voor meer inlichtingen</a>
   </div>
   <div class="r-cta-sub" style="font-size:14px;color:#fff;margin-top:16px">Dirk Vander Eyken &nbsp;&middot;&nbsp; +32 468 13 79 78 &nbsp;&middot;&nbsp; <a href="https://www.thenextlevel.consulting" target="_blank" class="link-plain">www.thenextlevel.consulting</a></div>
   <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.2);font-size:11px;color:rgba(255,255,255,.6);text-align:center">
@@ -834,11 +834,23 @@ function stuurNotificatie(naam,bedrijf,email,functie,mw,sector,scores,gem,gz){
 }
 
 function vraagGesprek(btnId){
-  if(!window._tnlData){return;}
   if(window._gesprekGestuurd) return;
-  window._gesprekGestuurd = true;
-
   const btn=document.getElementById(btnId);
+
+  // Gegevens nog niet klaar (achtergrond-opzoeking loopt nog): toon feedback en probeer zo opnieuw
+  if(!window._tnlData){
+    if(btn){btn.textContent='⏳ Even geduld...';btn.disabled=true;btn.style.opacity='0.7';}
+    window._gesprekWacht=(window._gesprekWacht||0)+1;
+    if(window._gesprekWacht>25){ // na ~10s opgeven
+      window._gesprekWacht=0;
+      if(btn){btn.textContent='❌ Probeer opnieuw';btn.disabled=false;btn.style.opacity='1';}
+      return;
+    }
+    setTimeout(function(){ vraagGesprek(btnId); },400);
+    return;
+  }
+  window._gesprekWacht=0;
+  window._gesprekGestuurd = true;
   if(btn){btn.textContent='⏳ Versturen...';btn.disabled=true;btn.style.opacity='0.7';}
 
   const d=window._tnlData;
@@ -877,6 +889,17 @@ function window_doPrint(btn){
   setTimeout(function(){ window.print(); }, 100);
 }
 window._doPrint = window_doPrint;
+
+// "Meer inlichtingen": mailto opent vanzelf; toon directe feedback zodat de knop niet dood lijkt
+function meerInlichtingen(el){
+  if(el._hint && el._hint.parentNode) return; // al getoond
+  var hint=document.createElement('div');
+  hint.textContent='📧 Uw mailprogramma wordt geopend… Geen mailvenster? Mail ons gerust rechtstreeks op dirk@ariadnebvba.be';
+  hint.style.cssText='width:100%;margin-top:8px;font-size:12px;font-weight:600;color:#fff;background:rgba(255,255,255,.15);padding:7px 12px;border-radius:8px';
+  el.insertAdjacentElement('afterend',hint);
+  el._hint=hint;
+  setTimeout(function(){ if(hint.parentNode){hint.parentNode.removeChild(hint);} el._hint=null; },8000);
+}
 
 
 

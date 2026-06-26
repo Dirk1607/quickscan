@@ -263,7 +263,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="step active" id="step-0">
   <div class="card">
     <div class="intro-box">
-      <p>Deze gratis Quick Scan brengt in kaart hoe uw organisatie scoort op <strong>16 domeinen</strong>, van strategie en sales tot HR, finance, operations en leadership. U beantwoordt 30 uitspraken en ontvangt daarna een gepersonaliseerd rapport met uw sterktes en groeikansen.</p>
+      <p>Deze gratis Quick Scan brengt in kaart hoe uw organisatie scoort op <strong>16 domeinen</strong>, van strategie en sales tot HR, finance, operations en leadership. U beantwoordt 32 uitspraken en ontvangt daarna een gepersonaliseerd rapport met uw sterktes en groeikansen.</p>
       <p>Beantwoord elke uitspraak zo eerlijk mogelijk op basis van uw dagelijkse realiteit. Er zijn geen goede of foute antwoorden, enkel uw werkelijke situatie telt.</p>
       <p><strong>Welke uitspraak is van toepassing op jouw organisatie?</strong></p>
       <div class="scale-legend">
@@ -356,37 +356,41 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 </div>
 <script>
+// v2.0 — elke metrolijn/versneller 2x als hoofddomein (h): 1 positief + 1 omgekeerd.
+// n = nevendomeinen (lichte invloed, afgetopt in calcScores). inv = omgekeerd geformuleerd.
 const VRAGEN=[
-  {t:"Beslissingen en vragen worden in ons bedrijf te weinig gedelegeerd: ze belanden steeds opnieuw bij dezelfde personen of bij de directie.",d:["OWN","LEAD","HR"],inv:true},
-  {t:"Ik heb onvoldoende zicht op de marges, cashpositie en rendabiliteit van het bedrijf.",d:["FIN","STR"],inv:true},
-  {t:"Onze huidige manier van werken kan de groei van het bedrijf niet meer aan.",d:["OPS","HR","PROC"],inv:true},
-  {t:"Problemen tussen afdelingen kosten ons meer energie dan we zouden willen.",d:["OPS","HR","LEAD"],inv:true},
-  {t:"Wij zetten verbeterinitiatieven om in concrete projecten en ronden die af binnen de afgesproken tijd en budget.",d:["PM","PROC","CHG"],inv:false},
-  {t:"Nieuwe medewerkers vinden snel hun weg om te begrijpen hoe systemen, processen en klantenwerking in elkaar zitten.",d:["PROC","HR","IT"],inv:false},
-  {t:"Onze leidinggevenden houden hun team gemotiveerd en betrokken, zonder voortdurend te moeten aansturen.",d:["LEAD","HR","CHG"],inv:false},
-  {t:"Mensen weten duidelijk wat van hen verwacht wordt en aan wie zij rapporteren.",d:["HR","PROC","OWN"],inv:false},
-  {t:"We zijn brandjes aan het blussen in plaats van de oorzaak aan te pakken.",d:["OPS","STR","PROC"],inv:true},
-  {t:"We verliezen klanten door interne chaos, opvolgingsproblemen of gebrekkige communicatie.",d:["AFS","OPS","QUA"],inv:true},
-  {t:"We weten precies welke klanten, producten, diensten of marktsegmenten geld opbrengen.",d:["FIN","SAL","MKT"],inv:false},
-  {t:"Wanneer we cijfers, klantinformatie of operationele data nodig hebben, vinden we die zonder veel zoekwerk.",d:["IT","FIN","PROC"],inv:false},
-  {t:"Beslissingen worden effectief uitgevoerd.",d:["PM","LEAD","OWN"],inv:false},
-  {t:"We moeten lastminute oplossingen bedenken of werk opnieuw uitvoeren om klanten, projecten of leveringen correct af te werken.",d:["QUA","OPS","PROC"],inv:true},
-  {t:"We slagen erin om de juiste medewerkers aan te trekken én te behouden.",d:["HR","STR","LEAD"],inv:false},
-  {t:"Mensen durven zeggen wanneer iets niet werkt.",d:["LEAD","HR","CHG"],inv:false},
-  {t:"Ik kan erop vertrouwen dat mijn medewerkers hun taken naar behoren uitvoeren, zonder dat ik hun werk moet controleren.",d:["QUA","PROC","OWN"],inv:false},
-  {t:"We verliezen energie en tijd aan interne discussies over prioriteiten en beslissingen.",d:["STR","LEAD","PM"],inv:true},
-  {t:"We kunnen snel schakelen wanneer klanten, technologie of de markt veranderen.",d:["PROD","STR","IT"],inv:false},
-  {t:"Het is voor onze medewerkers duidelijk waar het bedrijf naartoe wil.",d:["STR","HR","LEAD"],inv:false},
-  {t:"We hebben een actieve, gestructureerde aanpak om nieuwe klanten aan te trekken.",d:["SAL","MKT","STR"],inv:false},
-  {t:"Onze omzet is voldoende gespreid over meerdere klanten, zodat het wegvallen van één klant ons niet ernstig treft.",d:["FIN","SAL","STR"],inv:false},
-  {t:"We slagen erin om verantwoordelijkheden en beslissingen laag in de organisatie te leggen.",d:["OWN","HR","LEAD"],inv:false},
-  {t:"Onze medewerkers volgen de afgesproken procedures, systemen en klantaanpak.",d:["PROC","IT","QUA"],inv:false},
-  {t:"We bewaken kwaliteit, veiligheid en afspraken proactief, zodat problemen zelden onverwacht opduiken.",d:["SAF","QUA","PROC"],inv:false},
-  {t:"Elke uitbreiding van het team leidt tot merkbaar meer interne afstemming en dat vertraagt ons.",d:["HR","OPS","LEAD"],inv:true},
-  {t:"Ons managementteam trekt in dezelfde richting en heeft een gezamenlijk beeld van waar het bedrijf naartoe wil.",d:["STR","LEAD","CHG"],inv:false},
-  {t:"We weten precies waar in het bedrijf geld verloren gaat.",d:["FIN","OPS","PROC"],inv:false},
-  {t:"We weten duidelijk waarop wij ons onderscheiden van concurrenten en welke waarde we bieden aan onze klanten.",d:["STR","MKT","SAL"],inv:false},
-  {t:"Onze IT-systemen en digitale tools ondersteunen onze werking effectief; handmatige omwegen en workarounds zijn eerder uitzondering dan regel.",d:["IT","PROC"],inv:false}
+  {t:"Het is voor onze medewerkers duidelijk waar het bedrijf naartoe wil.",h:"STR",n:["HR","LEAD"],inv:false},
+  {t:"Ons aanbod is de voorbije jaren te weinig vernieuwd.",h:"PROD",n:["MKT","STR"],inv:true},
+  {t:"We weten waarop we ons onderscheiden en welke waarde we bieden, en dragen dat actief uit naar onze doelgroep.",h:"MKT",n:["STR","SAL"],inv:false},
+  {t:"We hebben weinig zicht op onze verkoopspijplijn; nieuwe orders komen onvoorspelbaar binnen.",h:"SAL",n:["FIN","OWN"],inv:true},
+  {t:"Onze planning en uitvoering verlopen gestructureerd, met weinig verrassingen.",h:"OPS",n:["PROC","SAF"],inv:false},
+  {t:"We verliezen klanten door interne chaos, opvolgingsproblemen of gebrekkige communicatie.",h:"AFS",n:["OPS","QUA"],inv:true},
+  {t:"We slagen erin om de juiste medewerkers aan te trekken én te behouden.",h:"HR",n:["LEAD","STR"],inv:false},
+  {t:"Ik heb onvoldoende zicht op de marges, cashpositie en rendabiliteit van het bedrijf.",h:"FIN",n:["STR","OPS"],inv:true},
+  {t:"Onze IT-systemen en tools ondersteunen onze werking effectief; workarounds zijn eerder uitzondering dan regel.",h:"IT",n:["PROC","OPS"],inv:false},
+  {t:"We moeten lastminute oplossingen bedenken of werk opnieuw doen om zaken correct af te werken.",h:"QUA",n:["OPS","AFS"],inv:true},
+  {t:"We bewaken kwaliteit, veiligheid en afspraken proactief, zodat problemen zelden onverwacht opduiken.",h:"SAF",n:["QUA","PROC"],inv:false},
+  {t:"Verbeterprojecten starten wel, maar verzanden of raken nooit echt af.",h:"PM",n:["OWN","CHG"],inv:true},
+  {t:"Onze medewerkers volgen de afgesproken procedures, systemen en klantaanpak.",h:"PROC",n:["IT","SAF"],inv:false},
+  {t:"Problemen tussen afdelingen kosten ons meer energie dan we zouden willen.",h:"LEAD",n:["OPS","HR"],inv:true},
+  {t:"Mensen durven zeggen wanneer iets niet werkt.",h:"CHG",n:["LEAD","HR"],inv:false},
+  {t:"Beslissingen en vragen worden te weinig gedelegeerd: ze belanden steeds opnieuw bij dezelfde personen of bij de directie.",h:"OWN",n:["LEAD","HR"],inv:true},
+  {t:"We verliezen energie en tijd aan interne discussies over prioriteiten en beslissingen.",h:"STR",n:["LEAD","PM"],inv:true},
+  {t:"We kunnen snel schakelen wanneer klanten, technologie of de markt veranderen.",h:"PROD",n:["STR","IT"],inv:false},
+  {t:"Te weinig mensen in onze doelgroep kennen ons of weten waarvoor we staan.",h:"MKT",n:["SAL","PROD"],inv:true},
+  {t:"We hebben een actieve, gestructureerde aanpak om nieuwe klanten aan te trekken.",h:"SAL",n:["MKT","FIN"],inv:false},
+  {t:"We zijn brandjes aan het blussen in plaats van de oorzaak aan te pakken.",h:"OPS",n:["PROC","AFS"],inv:true},
+  {t:"We volgen klanten na de verkoop proactief op en lossen problemen snel op.",h:"AFS",n:["QUA","SAL"],inv:false},
+  {t:"Elke uitbreiding van het team leidt tot merkbaar meer interne afstemming en dat vertraagt ons.",h:"HR",n:["OPS","LEAD"],inv:true},
+  {t:"We weten precies welke klanten, producten of segmenten geld opbrengen.",h:"FIN",n:["SAL","STR"],inv:false},
+  {t:"We verliezen tijd aan handmatig werk, losse Excel-bestanden of systemen die niet met elkaar praten.",h:"IT",n:["PROC","FIN"],inv:true},
+  {t:"Ik kan erop vertrouwen dat medewerkers hun taken naar behoren uitvoeren, zonder dat ik hun werk moet controleren.",h:"QUA",n:["PROC","OWN"],inv:false},
+  {t:"Onder tijdsdruk laten we afspraken rond veiligheid of kwaliteit los.",h:"SAF",n:["QUA","HR"],inv:true},
+  {t:"Wij zetten verbeterinitiatieven om in concrete projecten en ronden die af binnen de afgesproken tijd en budget.",h:"PM",n:["PROC","CHG"],inv:false},
+  {t:"Onze werkinstructies zijn niet duidelijk en behoeven vaak uitleg en extra opleiding.",h:"PROC",n:["HR","QUA"],inv:true},
+  {t:"Onze leidinggevenden houden hun team gemotiveerd en betrokken, zonder voortdurend te moeten aansturen.",h:"LEAD",n:["HR","CHG"],inv:false},
+  {t:"Veranderingen worden bij ons moeilijk doorgevoerd: er is veel weerstand of ze verwateren.",h:"CHG",n:["LEAD","PM"],inv:true},
+  {t:"Mensen weten duidelijk wat van hen verwacht wordt en aan wie zij rapporteren.",h:"OWN",n:["HR","PROC"],inv:false}
 ];
 
 const DOMAINS={
@@ -411,20 +415,20 @@ function getFallback(z){
   {b:"badge-g",br:"bar-g",lbl:"Sterke troef",wat:"Dit domein is professioneel uitgebouwd en vormt een echte troef.",herk:"De organisatie scoort aantoonbaar beter dan vergelijkbare KMO's.",impact:"Dit is een duurzaam concurrentievoordeel dat moeilijk te kopiëren is.",nieuws:"De uitdaging is dit voordeel te bewaken bij verdere groei.",visie:"Uitstekend. Koester en onderhoud deze competentie."}][z-1];
 }
 
-const rawAns=new Array(30).fill(0);
-const scoreVals=new Array(30).fill(0);
+const rawAns=new Array(VRAGEN.length).fill(0);
+const scoreVals=new Array(VRAGEN.length).fill(0);
 let currentStep=0;
 
 function buildBlocks(){
   const el=document.getElementById('step-1');
+  const N=VRAGEN.length, per=4;
   let html='';
-  for(let b=0;b<6;b++){
-    const start=b*5;
+  for(let start=0;start<N;start+=per){
     html+='<div class="card">';
-    for(let i=start;i<start+5;i++){
+    for(let i=start;i<Math.min(start+per,N);i++){
       const v=VRAGEN[i];
       html+=`<div class="q-card" id="qc-${i}">
-  <div class="q-text"><span class="q-num" style="white-space:nowrap">${i+1}/30 &nbsp;</span>${v.t}</div>
+  <div class="q-text"><span class="q-num" style="white-space:nowrap">${i+1}/${N} &nbsp;</span>${v.t}</div>
   <div class="ans-row">
     <button class="ans-btn" onclick="setAns(${i},1,${v.inv?4:1},this,${v.inv})" data-q="${i}">Helemaal niet akkoord</button>
     <button class="ans-btn" onclick="setAns(${i},2,${v.inv?3:2},this,${v.inv})" data-q="${i}">Niet akkoord</button>
@@ -440,7 +444,7 @@ function buildBlocks(){
 }
 
 function submitAlleVragen(){
-  for(let i=0;i<30;i++){
+  for(let i=0;i<VRAGEN.length;i++){
     if(!rawAns[i]){
       showMelding('Beantwoord alle vragen voor u verdergaat.');
       const card=document.getElementById('qc-'+i);
@@ -459,7 +463,7 @@ function setAns(qi,raw,sv,btn){
   const card=document.getElementById('qc-'+qi);
   if(card)card.classList.add('answered');
   const answered=rawAns.filter(a=>a>0).length;
-  const pct=Math.round(answered/30*100);
+  const pct=Math.round(answered/VRAGEN.length*100);
   document.getElementById('prog').style.width=pct+'%';
   document.getElementById('prog-pct').textContent=pct+'%';
 }
@@ -475,7 +479,7 @@ function goStep(n){
   const pct=n===0?0:n===7?100:0;
   document.getElementById('prog').style.width=pct+'%';
   document.getElementById('prog-pct').textContent=pct+'%';
-  document.getElementById('prog-label').textContent=n===0?'Introductie':n===7?'Rapport klaar':'30 vragen';
+  document.getElementById('prog-label').textContent=n===0?'Introductie':n===7?'Rapport klaar':VRAGEN.length+' vragen';
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -518,19 +522,34 @@ function nextBlock(b){
   }
 }
 
+// v3-scoring: elk domein heeft 2 hoofdvragen (h) + lichte nevendomeinen (n).
+// "Optie 2": laagste hoofdvraag telt dubbel zodat echte pijn niet wegmiddelt;
+// nevendomeinen samen ~20% (afgetopt), hoofdvragen ~80%.
 function calcScores(){
-  const tot={},cnt={};
-  Object.keys(DOMAINS).forEach(d=>{tot[d]=0;cnt[d]=0;});
+  const main={},side={};
+  Object.keys(DOMAINS).forEach(d=>{main[d]=[];side[d]=[];});
   VRAGEN.forEach((v,i)=>{
     if(!scoreVals[i])return;
-    v.d.forEach((d,di)=>{const w=di===0?3:di===1?2:1;tot[d]+=scoreVals[i]*w;cnt[d]+=w;});
+    main[v.h].push(scoreVals[i]);
+    (v.n||[]).forEach(d=>{if(side[d])side[d].push(scoreVals[i]);});
   });
+  const avg=a=>a.reduce((s,x)=>s+x,0)/a.length;
   const sc={};
-  Object.keys(DOMAINS).forEach(d=>{sc[d]=cnt[d]?Math.round(tot[d]/cnt[d]*10)/10:0;});
+  Object.keys(DOMAINS).forEach(d=>{
+    const m=main[d];
+    if(!m.length){sc[d]=0;return;}
+    // hoofdcomponent: laagste telt dubbel → (2*min + max)/3
+    const lo=Math.min(...m),hi=Math.max(...m);
+    const hoofd=(2*lo+hi)/3;
+    const s=side[d];
+    const val=s.length?0.8*hoofd+0.2*avg(s):hoofd;
+    sc[d]=Math.round(val*10)/10;
+  });
   return sc;
 }
 
-function getZone(s){return s<=1.75?1:s<=2.5?2:s<=3.25?3:4;}
+// Strengere lat: <2.2 kritisch / <3.0 aandacht / <3.6 goed / ≥3.6 sterke troef
+function getZone(s){return s<2.2?1:s<3.0?2:s<3.6?3:4;}
 function getProfiel(code,zone){return(P[code]&&P[code][zone])||getFallback(zone);}
 
 function domeinBlock(code,scores,showScore=false){
@@ -766,6 +785,45 @@ ${[...VERSNELLERS].sort((a,b)=>scores[a]-scores[b]).map(c=>domeinBlock(c,scores,
   }
 })();
 
+// Detail-/berekeningsblok voor het test-/notificatierapport: toont per domein
+// de gekozen antwoorden op de 2 hoofdvragen + de volledige scoreberekening.
+function buildBerekeningTxt(scores){
+  const ANS=['Helemaal niet akkoord','Niet akkoord','Akkoord','Volledig akkoord'];
+  const r2=x=>Math.round(x*100)/100;
+  const main={},side={};
+  Object.keys(DOMAINS).forEach(d=>{main[d]=[];side[d]=[];});
+  VRAGEN.forEach((v,i)=>{
+    if(!scoreVals[i])return;
+    main[v.h].push(i);
+    (v.n||[]).forEach(d=>{if(side[d])side[d].push(i);});
+  });
+  let out='===== DETAIL & BEREKENING =====\n';
+  out+='Antwoord 1-4 (1=Helemaal niet akkoord ... 4=Volledig akkoord). "telt als" = na omkering bij omgekeerde vragen (4=positief).\n';
+  out+='Formule: Hoofd = (2x laagste + hoogste)/3 ; Eind = 0.8x Hoofd + 0.2x gem(neven). Zone: <2.2 kritisch / <3.0 aandacht / <3.6 goed / >=3.6 troef.\n';
+  [...LIJNEN,...VERSNELLERS].forEach(d=>{
+    const mIdx=main[d];
+    out+='\n=== '+DOMAINS[d]+' = '+scores[d]+'/4 ('+getProfiel(d,getZone(scores[d])).lbl+') ===\n';
+    if(!mIdx.length){out+='(geen antwoorden)\n';return;}
+    mIdx.forEach(i=>{
+      const v=VRAGEN[i],raw=rawAns[i];
+      out+='• V'+(i+1)+(v.inv?' (omgekeerd)':'')+': "'+v.t+'" => '+(raw?ANS[raw-1]+' (telt als '+scoreVals[i]+')':'NIET INGEVULD')+'\n';
+    });
+    const mVals=mIdx.map(i=>scoreVals[i]);
+    const lo=Math.min(...mVals),hi=Math.max(...mVals),hoofd=(2*lo+hi)/3;
+    out+='Hoofd = (2x'+lo+' + '+hi+')/3 = '+r2(hoofd)+'\n';
+    const sIdx=side[d];
+    if(sIdx.length){
+      const sVals=sIdx.map(i=>scoreVals[i]);
+      const savg=sVals.reduce((a,b)=>a+b,0)/sVals.length;
+      out+='Neven ('+sIdx.map(i=>'V'+(i+1)+'='+scoreVals[i]).join(', ')+') gem = '+r2(savg)+'\n';
+      out+='Eind = 0.8x'+r2(hoofd)+' + 0.2x'+r2(savg)+' = '+scores[d]+'\n';
+    }else{
+      out+='Geen nevendomein -> Eind = '+r2(hoofd)+' = '+scores[d]+'\n';
+    }
+  });
+  return out;
+}
+
 function stuurNotificatie(naam,bedrijf,email,functie,mw,sector,scores,gem,gz){
   if(typeof emailjs==='undefined'||!emailjs.send)return;
   const scoresTxt=Object.keys(DOMAINS).map(d=>{
@@ -773,6 +831,7 @@ function stuurNotificatie(naam,bedrijf,email,functie,mw,sector,scores,gem,gz){
     const p=getProfiel(d,z);
     return DOMAINS[d]+': '+scores[d]+'/4 ('+p.lbl+')';
   }).join('\n');
+  const berekeningTxt=buildBerekeningTxt(scores);
 
   const telVal=document.getElementById('f-tel')?document.getElementById('f-tel').value.trim()||'Niet ingevuld':'Niet ingevuld';
   const datumVal=new Date().toLocaleDateString('nl-BE',{day:'2-digit',month:'long',year:'numeric'});
@@ -785,7 +844,7 @@ function stuurNotificatie(naam,bedrijf,email,functie,mw,sector,scores,gem,gz){
     functie:functie||'Niet ingevuld',
     medewerkers:mw||'Niet ingevuld',
     sector:sector||'Niet ingevuld',
-    tel:telVal, score:gem+' / 4', rapport:scoresTxt,
+    tel:telVal, score:gem+' / 4', rapport:scoresTxt+'\n\n'+berekeningTxt,
     status:'📋 Rapport gegenereerd',
     pdf_afgedrukt:'Nog niet afgedrukt',
     datum:datumVal
@@ -1081,7 +1140,7 @@ function testInvullen(){
     setTimeout(testInvullen, 100);
     return;
   }
-  // Vul alle 30 vragen willekeurig in
+  // Vul alle vragen willekeurig in
   VRAGEN.forEach((v, i) => {
     const raw = Math.floor(Math.random() * 4) + 1; // 1-4
     const sv = v.inv ? (5 - raw) : raw;

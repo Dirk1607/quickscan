@@ -341,7 +341,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <button class="btn btn-primary" onclick="startScan()">Start de Quick Scan &rarr;</button>
     </div>
   </div>
-  <div style="text-align:center;font-size:10px;color:var(--muted);opacity:.5;margin-top:10px;letter-spacing:.3px">&copy; The Next Level &middot; v2.7</div>
+  <div style="text-align:center;font-size:10px;color:var(--muted);opacity:.5;margin-top:10px;letter-spacing:.3px">&copy; The Next Level &middot; v2.6</div>
 </div>
 
 <div class="step" id="step-1"></div>
@@ -365,13 +365,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 // hoofddomein staan nooit naast elkaar (elk paar ligt min. 11 posities uit elkaar).
 // n = nevendomeinen (lichte invloed, afgetopt in calcScores).
 const VRAGEN=[
+  {t:"Ik heb onvoldoende zicht op de marges, cashpositie en rendabiliteit van het bedrijf.",h:"FIN",n:["STR","OPS"],inv:true},
   {t:"We verliezen energie en tijd aan interne discussies over prioriteiten en beslissingen.",h:"STR",n:["LEAD","PM"],inv:true},
   {t:"Klanten haken af of komen niet terug omdat onze opvolging na de verkoop tekortschiet.",h:"AFS",n:["QUA","SAL"],inv:true},
   {t:"We verliezen tijd aan handmatig werk, losse Excel-bestanden of systemen die niet met elkaar praten.",h:"IT",n:["PROC","FIN"],inv:true},
   {t:"Verbeterprojecten starten wel, maar verzanden of raken nooit echt af.",h:"PM",n:["CHG","LEAD"],inv:true},
   {t:"We zijn brandjes aan het blussen in plaats van de oorzaak aan te pakken.",h:"OPS",n:["PROC","AFS"],inv:true},
   {t:"Functies en verantwoordelijkheden zijn bij ons onvoldoende duidelijk afgebakend.",h:"HR",n:["PROC","LEAD"],inv:true},
-  {t:"Ik heb onvoldoende zicht op de marges, cashpositie en rendabiliteit van het bedrijf.",h:"FIN",n:["STR","OPS"],inv:true},
   {t:"Bij drukte wordt er afgeweken van de veiligheidsafspraken.",h:"SAF",n:["QUA","HR"],inv:true},
   {t:"Ons aanbod dreigt achterop te raken: we vernieuwen of verbeteren het te traag.",h:"PROD",n:["STR","MKT"],inv:true},
   {t:"Te weinig potentiële klanten kennen ons of weten waarvoor we staan.",h:"MKT",n:["SAL","PROD"],inv:true},

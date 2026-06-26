@@ -263,7 +263,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="step active" id="step-0">
   <div class="card">
     <div class="intro-box">
-      <p>Deze gratis Quick Scan brengt in kaart hoe uw organisatie scoort op <strong>16 domeinen</strong>, van strategie en sales tot HR, finance, operations en leadership. U beantwoordt 32 uitspraken en ontvangt daarna een gepersonaliseerd rapport met uw sterktes en groeikansen.</p>
+      <p>Deze gratis Quick Scan brengt in kaart hoe uw organisatie scoort op <strong>15 domeinen</strong>, van strategie en sales tot HR, finance, operations en leadership. U beantwoordt 30 uitspraken en ontvangt daarna een gepersonaliseerd rapport met uw sterktes en groeikansen.</p>
       <p>Beantwoord elke uitspraak zo eerlijk mogelijk op basis van uw dagelijkse realiteit. Er zijn geen goede of foute antwoorden, enkel uw werkelijke situatie telt.</p>
       <p><strong>Welke uitspraak is van toepassing op jouw organisatie?</strong></p>
       <div class="scale-legend">
@@ -341,7 +341,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <button class="btn btn-primary" onclick="startScan()">Start de Quick Scan &rarr;</button>
     </div>
   </div>
-  <div style="text-align:center;font-size:10px;color:var(--muted);opacity:.5;margin-top:10px;letter-spacing:.3px">&copy; The Next Level &middot; v2.0</div>
+  <div style="text-align:center;font-size:10px;color:var(--muted);opacity:.5;margin-top:10px;letter-spacing:.3px">&copy; The Next Level &middot; v2.1</div>
 </div>
 
 <div class="step" id="step-1"></div>
@@ -357,41 +357,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 </div>
 <script>
-// v2.0 — elke metrolijn/versneller 2x als hoofddomein (h): 1 positief + 1 omgekeerd.
+// v2.1 — 15 domeinen (11 metrolijnen + 4 versnellers), elk 2x als hoofddomein (h):
+// 1 positief + 1 omgekeerd. Ownership geschrapt (verantwoordelijkheid/rolduidelijkheid zit nu in HR).
 // n = nevendomeinen (lichte invloed, afgetopt in calcScores). inv = omgekeerd geformuleerd.
 const VRAGEN=[
-  {t:"Het is voor onze medewerkers duidelijk waar het bedrijf naartoe wil.",h:"STR",n:["HR","LEAD"],inv:false},
-  {t:"Ons aanbod is de voorbije jaren te weinig vernieuwd.",h:"PROD",n:["MKT","STR"],inv:true},
-  {t:"We weten waarop we ons onderscheiden en welke waarde we bieden, en dragen dat actief uit naar onze doelgroep.",h:"MKT",n:["STR","SAL"],inv:false},
-  {t:"We hebben weinig zicht op onze verkoopspijplijn; nieuwe orders komen onvoorspelbaar binnen.",h:"SAL",n:["FIN","OWN"],inv:true},
+  {t:"We hebben heldere strategische keuzes gemaakt over waar we wél en niet op inzetten, en sturen daar consequent op.",h:"STR",n:["HR","LEAD"],inv:false},
+  {t:"Ons aanbod dreigt achterop te raken: we vernieuwen of verbeteren het te traag.",h:"PROD",n:["STR","MKT"],inv:true},
+  {t:"We kunnen in één zin uitleggen waarom een klant voor ons kiest en niet voor een concurrent (onze USP).",h:"MKT",n:["STR","SAL"],inv:false},
+  {t:"We hebben weinig zicht op onze verkoopspijplijn; nieuwe orders komen onvoorspelbaar binnen.",h:"SAL",n:["FIN","STR"],inv:true},
   {t:"Onze planning en uitvoering verlopen gestructureerd, met weinig verrassingen.",h:"OPS",n:["PROC","SAF"],inv:false},
-  {t:"We verliezen klanten door interne chaos, opvolgingsproblemen of gebrekkige communicatie.",h:"AFS",n:["OPS","QUA"],inv:true},
+  {t:"Klanten haken af of komen niet terug omdat onze opvolging na de verkoop tekortschiet.",h:"AFS",n:["QUA","SAL"],inv:true},
   {t:"We slagen erin om de juiste medewerkers aan te trekken én te behouden.",h:"HR",n:["LEAD","STR"],inv:false},
   {t:"Ik heb onvoldoende zicht op de marges, cashpositie en rendabiliteit van het bedrijf.",h:"FIN",n:["STR","OPS"],inv:true},
   {t:"Onze IT-systemen en tools ondersteunen onze werking effectief; workarounds zijn eerder uitzondering dan regel.",h:"IT",n:["PROC","OPS"],inv:false},
   {t:"We moeten lastminute oplossingen bedenken of werk opnieuw doen om zaken correct af te werken.",h:"QUA",n:["OPS","AFS"],inv:true},
-  {t:"We bewaken kwaliteit, veiligheid en afspraken proactief, zodat problemen zelden onverwacht opduiken.",h:"SAF",n:["QUA","PROC"],inv:false},
-  {t:"Verbeterprojecten starten wel, maar verzanden of raken nooit echt af.",h:"PM",n:["OWN","CHG"],inv:true},
+  {t:"Veiligheid zit verankerd in onze werking; iedereen kent en volgt de regels.",h:"SAF",n:["QUA","PROC"],inv:false},
+  {t:"Verbeterprojecten starten wel, maar verzanden of raken nooit echt af.",h:"PM",n:["CHG","LEAD"],inv:true},
   {t:"Onze medewerkers volgen de afgesproken procedures, systemen en klantaanpak.",h:"PROC",n:["IT","SAF"],inv:false},
   {t:"Problemen tussen afdelingen kosten ons meer energie dan we zouden willen.",h:"LEAD",n:["OPS","HR"],inv:true},
-  {t:"Mensen durven zeggen wanneer iets niet werkt.",h:"CHG",n:["LEAD","HR"],inv:false},
-  {t:"Beslissingen en vragen worden te weinig gedelegeerd: ze belanden steeds opnieuw bij dezelfde personen of bij de directie.",h:"OWN",n:["LEAD","HR"],inv:true},
+  {t:"Wanneer we iets willen veranderen, krijgen we mensen mee en houden we de verandering vol.",h:"CHG",n:["LEAD","HR"],inv:false},
   {t:"We verliezen energie en tijd aan interne discussies over prioriteiten en beslissingen.",h:"STR",n:["LEAD","PM"],inv:true},
-  {t:"We kunnen snel schakelen wanneer klanten, technologie of de markt veranderen.",h:"PROD",n:["STR","IT"],inv:false},
+  {t:"Ons aanbod sluit goed aan op wat onze klanten vandaag nodig hebben.",h:"PROD",n:["MKT","STR"],inv:false},
   {t:"Te weinig mensen in onze doelgroep kennen ons of weten waarvoor we staan.",h:"MKT",n:["SAL","PROD"],inv:true},
   {t:"We hebben een actieve, gestructureerde aanpak om nieuwe klanten aan te trekken.",h:"SAL",n:["MKT","FIN"],inv:false},
   {t:"We zijn brandjes aan het blussen in plaats van de oorzaak aan te pakken.",h:"OPS",n:["PROC","AFS"],inv:true},
   {t:"We volgen klanten na de verkoop proactief op en lossen problemen snel op.",h:"AFS",n:["QUA","SAL"],inv:false},
-  {t:"Elke uitbreiding van het team leidt tot merkbaar meer interne afstemming en dat vertraagt ons.",h:"HR",n:["OPS","LEAD"],inv:true},
+  {t:"Het is niet duidelijk wat van wie verwacht wordt en waarvoor hij verantwoordelijk is.",h:"HR",n:["PROC","LEAD"],inv:true},
   {t:"We weten precies welke klanten, producten of segmenten geld opbrengen.",h:"FIN",n:["SAL","STR"],inv:false},
   {t:"We verliezen tijd aan handmatig werk, losse Excel-bestanden of systemen die niet met elkaar praten.",h:"IT",n:["PROC","FIN"],inv:true},
-  {t:"Ik kan erop vertrouwen dat medewerkers hun taken naar behoren uitvoeren, zonder dat ik hun werk moet controleren.",h:"QUA",n:["PROC","OWN"],inv:false},
-  {t:"Onder tijdsdruk laten we afspraken rond veiligheid of kwaliteit los.",h:"SAF",n:["QUA","HR"],inv:true},
+  {t:"Onze producten of diensten voldoen consistent aan de kwaliteitseisen; klachten over kwaliteit zijn zeldzaam.",h:"QUA",n:["PROC","AFS"],inv:false},
+  {t:"Bij drukte wordt er afgeweken van de veiligheidsafspraken.",h:"SAF",n:["QUA","HR"],inv:true},
   {t:"Wij zetten verbeterinitiatieven om in concrete projecten en ronden die af binnen de afgesproken tijd en budget.",h:"PM",n:["PROC","CHG"],inv:false},
-  {t:"Onze werkinstructies zijn niet duidelijk en behoeven vaak uitleg en extra opleiding.",h:"PROC",n:["HR","QUA"],inv:true},
+  {t:"Iedereen werkt op zijn eigen manier; processen liggen niet vast of worden niet gevolgd.",h:"PROC",n:["HR","QUA"],inv:true},
   {t:"Onze leidinggevenden houden hun team gemotiveerd en betrokken, zonder voortdurend te moeten aansturen.",h:"LEAD",n:["HR","CHG"],inv:false},
-  {t:"Veranderingen worden bij ons moeilijk doorgevoerd: er is veel weerstand of ze verwateren.",h:"CHG",n:["LEAD","PM"],inv:true},
-  {t:"Mensen weten duidelijk wat van hen verwacht wordt en aan wie zij rapporteren.",h:"OWN",n:["HR","PROC"],inv:false}
+  {t:"Veranderingen worden bij ons moeilijk doorgevoerd: er is veel weerstand of ze verwateren.",h:"CHG",n:["LEAD","PM"],inv:true}
 ];
 
 const DOMAINS={
@@ -399,10 +398,10 @@ const DOMAINS={
   OPS:"Operations",AFS:"After Sales",HR:"HR",FIN:"Finance",
   IT:"IT",QUA:"Kwaliteit",SAF:"Veiligheid",
   PM:"Project Management",PROC:"Proces Management",LEAD:"Leadership",
-  CHG:"Change Management",OWN:"Ownership"
+  CHG:"Change Management"
 };
 const LIJNEN=["STR","PROD","MKT","SAL","OPS","AFS","HR","FIN","IT","QUA","SAF"];
-const VERSNELLERS=["PM","PROC","LEAD","CHG","OWN"];
+const VERSNELLERS=["PM","PROC","LEAD","CHG"];
 const BLOKKEN=["Organisatie & Mensen","Sturing & Processen","Leadership & Resultaat","Klant & Commercieel","Veiligheid & Kwaliteit","Strategie & Richting"];
 
 // ── VOLLEDIGE 64 PROFIELEN ─────────────────────────────────────────────────
@@ -422,7 +421,7 @@ let currentStep=0;
 
 function buildBlocks(){
   const el=document.getElementById('step-1');
-  const N=VRAGEN.length, per=4;
+  const N=VRAGEN.length, per=5;
   let html='';
   for(let start=0;start<N;start+=per){
     html+='<div class="card">';
@@ -586,7 +585,7 @@ function buildRapport(){
   // Niet-expertise domeinen krijgen factor 1.10 op hun ranking-score
   // zodat expertise-domeinen licht bevoordeeld worden bij gelijke scores.
   // De zichtbare scores in het rapport blijven ongewijzigd.
-  const EXPERTISE = new Set(['STR','FIN','HR','PM','PROC','OWN']);
+  const EXPERTISE = new Set(['STR','FIN','HR','PM','PROC']);
   const RANK_FACTOR = 1.10; // niet-expertise moet 10% beter scoren om prioriteit te krijgen
   const rankScore = (code) => scores[code] * (EXPERTISE.has(code) ? 1.0 : RANK_FACTOR);
 
@@ -660,7 +659,7 @@ function buildRapport(){
     </p>
     <ul style="font-size:13px;color:#334155;line-height:1.8;padding-left:20px;margin-bottom:12px">
       <li><strong>11 bedrijfsdomeinen</strong>, de klassieke functies van een organisatie: strategie, sales, marketing, operations, HR, finance, IT, kwaliteit en meer. Dit zijn de "lijnen" van het metroplan.</li>
-      <li><strong>5 organisatieversnellers</strong>, domein-overstijgende thema's die bepalen hoe goed een organisatie verandert en doorgroeit: Project Management, Proces Management, Leadership, Change Management en Ownership. Dit zijn de "versnellers" die elke lijn beïnvloeden.</li>
+      <li><strong>4 organisatieversnellers</strong>, domein-overstijgende thema's die bepalen hoe goed een organisatie verandert en doorgroeit: Project Management, Proces Management, Leadership en Change Management. Dit zijn de "versnellers" die elke lijn beïnvloeden.</li>
     </ul>
     <p style="font-size:13px;color:#334155;line-height:1.7;margin-bottom:16px">
       Per domein krijgt u een score en een kleurcode: kritisch aandachtspunt, werkpunt, goed ontwikkeld, sterke troef. De prioriteiten onderaan zijn de domeinen met de meeste hefboomwerking voor uw specifieke situatie.
@@ -697,13 +696,12 @@ function buildRapport(){
     <div class="mdot" id="mdot-PM" style="left:28.8%;top:32.4%" data-code="PM" data-full="Project Mgmt"><span class="mdot-lbl">PM</span></div>
     <div class="mdot" id="mdot-LEAD" style="left:29.1%;top:59.9%" data-code="LEAD" data-full="Leadership"><span class="mdot-lbl">LEAD</span></div>
     <div class="mdot" id="mdot-CHG" style="left:29.2%;top:74.4%" data-code="CHG" data-full="Change Mgmt"><span class="mdot-lbl">CHG</span></div>
-    <div class="mdot" id="mdot-OWN" style="left:41.7%;top:74.4%" data-code="OWN" data-full="Ownership"><span class="mdot-lbl">OWN</span></div>
   </div>
 </div>
 
 <div class="radar-grid" style="margin-top:16px">
   <div class="radar-card"><h3>De 11 metrolijnen</h3><canvas id="radar-lijnen" width="440" height="440"></canvas></div>
-  <div class="radar-card"><h3>De 5 versnellers</h3><canvas id="radar-vers" width="440" height="440"></canvas></div>
+  <div class="radar-card"><h3>De 4 versnellers</h3><canvas id="radar-vers" width="440" height="440"></canvas></div>
 </div>
 
 <div class="r-section-title">1. Onze eerste indruk</div>
@@ -755,7 +753,7 @@ ${topVers.map((code,idx)=>{
 <div class="r-section-title">5a. De 11 metrolijnen</div>
 ${[...LIJNEN].sort((a,b)=>scores[a]-scores[b]).map(c=>domeinBlock(c,scores,true)).join('')}
 
-<div class="r-section-title">5b. De 5 organisatieversnellers</div>
+<div class="r-section-title">5b. De 4 organisatieversnellers</div>
 ${[...VERSNELLERS].sort((a,b)=>scores[a]-scores[b]).map(c=>domeinBlock(c,scores,true)).join('')}
 
 <div class="r-cta no-print">

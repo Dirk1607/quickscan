@@ -341,7 +341,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <button class="btn btn-primary" onclick="startScan()">Start de Quick Scan &rarr;</button>
     </div>
   </div>
-  <div style="text-align:center;font-size:10px;color:var(--muted);opacity:.5;margin-top:10px;letter-spacing:.3px">&copy; The Next Level &middot; v2.2</div>
+  <div style="text-align:center;font-size:10px;color:var(--muted);opacity:.5;margin-top:10px;letter-spacing:.3px">&copy; The Next Level &middot; v2.3</div>
 </div>
 
 <div class="step" id="step-1"></div>
@@ -369,7 +369,7 @@ const VRAGEN=[
   {t:"We hebben weinig zicht op onze verkoopspijplijn; nieuwe orders komen onvoorspelbaar binnen.",h:"SAL",n:["FIN","STR"],inv:true},
   {t:"We zijn brandjes aan het blussen in plaats van de oorzaak aan te pakken.",h:"OPS",n:["PROC","AFS"],inv:true},
   {t:"Klanten haken af of komen niet terug omdat onze opvolging na de verkoop tekortschiet.",h:"AFS",n:["QUA","SAL"],inv:true},
-  {t:"Het is niet duidelijk wat van wie verwacht wordt en waarvoor hij verantwoordelijk is.",h:"HR",n:["PROC","LEAD"],inv:true},
+  {t:"Functies en verantwoordelijkheden zijn bij ons onvoldoende duidelijk afgebakend.",h:"HR",n:["PROC","LEAD"],inv:true},
   {t:"Ik heb onvoldoende zicht op de marges, cashpositie en rendabiliteit van het bedrijf.",h:"FIN",n:["STR","OPS"],inv:true},
   {t:"We verliezen tijd aan handmatig werk, losse Excel-bestanden of systemen die niet met elkaar praten.",h:"IT",n:["PROC","FIN"],inv:true},
   {t:"We moeten lastminute oplossingen bedenken of werk opnieuw doen om zaken correct af te werken.",h:"QUA",n:["OPS","AFS"],inv:true},
@@ -384,7 +384,7 @@ const VRAGEN=[
   {t:"Nieuwe klanten werven gebeurt bij ons te veel op toeval, zonder gestructureerde aanpak.",h:"SAL",n:["MKT","FIN"],inv:true},
   {t:"Wanneer het druk wordt, loopt onze werking vast en krijgen we het werk niet vlot georganiseerd.",h:"OPS",n:["PROC","SAF"],inv:true},
   {t:"We volgen onze klanten na de verkoop te weinig proactief op; problemen blijven te lang liggen.",h:"AFS",n:["QUA","SAL"],inv:true},
-  {t:"Goede mensen vertrekken sneller dan we willen, of sleutelfuncties raken moeilijk ingevuld.",h:"HR",n:["LEAD","STR"],inv:true},
+  {t:"We hebben veel verloop, en goede mensen vinden is bovendien niet evident.",h:"HR",n:["LEAD","STR"],inv:true},
   {t:"We werken te weinig met budgetten om onze kosten en investeringen vooraf te plannen en op te volgen.",h:"FIN",n:["SAL","STR"],inv:true},
   {t:"Onze IT is kwetsbaar: systemen zijn verouderd en onvoldoende beveiligd.",h:"IT",n:["PROC","OPS"],inv:true},
   {t:"Onze kwaliteit is wisselvallig; klachten over kwaliteit komen regelmatig terug.",h:"QUA",n:["PROC","AFS"],inv:true},
@@ -394,6 +394,13 @@ const VRAGEN=[
   {t:"Bij ons wordt er veel gezegd maar te weinig consequent opgevolgd.",h:"LEAD",n:["HR","CHG"],inv:true},
   {t:"Bij veranderingen worden mensen te weinig betrokken of geïnformeerd; het overkomt hen.",h:"CHG",n:["LEAD","HR"],inv:true}
 ];
+
+// Volgorde willekeurig per sessie, maar nooit twee vragen van hetzelfde hoofddomein naast elkaar.
+(function shuffleVragen(){
+  function shuffle(){for(let i=VRAGEN.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[VRAGEN[i],VRAGEN[j]]=[VRAGEN[j],VRAGEN[i]];}}
+  function adjOk(){for(let i=1;i<VRAGEN.length;i++){if(VRAGEN[i].h===VRAGEN[i-1].h)return false;}return true;}
+  let tries=0;do{shuffle();tries++;}while(!adjOk()&&tries<50);
+})();
 
 const DOMAINS={
   STR:"Strategie",PROD:"Product / R&D",MKT:"Marketing",SAL:"Sales",
@@ -423,13 +430,11 @@ let currentStep=0;
 
 function buildBlocks(){
   const el=document.getElementById('step-1');
-  const N=VRAGEN.length, per=5;
-  let html='';
-  for(let start=0;start<N;start+=per){
-    html+='<div class="card">';
-    for(let i=start;i<Math.min(start+per,N);i++){
-      const v=VRAGEN[i];
-      html+=`<div class="q-card" id="qc-${i}">
+  const N=VRAGEN.length;
+  let html='<div class="card">';
+  for(let i=0;i<N;i++){
+    const v=VRAGEN[i];
+    html+=`<div class="q-card" id="qc-${i}">
   <div class="q-text"><span class="q-num" style="white-space:nowrap">${i+1}/${N} &nbsp;</span>${v.t}</div>
   <div class="ans-row">
     <button class="ans-btn" onclick="setAns(${i},1,${v.inv?4:1},this,${v.inv})" data-q="${i}">Helemaal niet akkoord</button>
@@ -438,9 +443,8 @@ function buildBlocks(){
     <button class="ans-btn" onclick="setAns(${i},4,${v.inv?1:4},this,${v.inv})" data-q="${i}">Volledig akkoord</button>
   </div>
 </div>`;
-    }
-    html+='</div>';
   }
+  html+='</div>';
   html+=`<div class="nav-row"><button class="btn" onclick="goStep(0)">&larr; Terug</button><button class="btn btn-primary" onclick="submitAlleVragen()">Bekijk mijn rapport &rarr;</button></div>`;
   el.innerHTML=html;
 }

@@ -341,7 +341,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <button class="btn btn-primary" onclick="startScan()">Start de Quick Scan &rarr;</button>
     </div>
   </div>
-  <div style="text-align:center;font-size:10px;color:var(--muted);opacity:.5;margin-top:10px;letter-spacing:.3px">&copy; The Next Level &middot; v2.7</div>
+  <div style="text-align:center;font-size:10px;color:var(--muted);opacity:.5;margin-top:10px;letter-spacing:.3px">&copy; The Next Level &middot; v2.8</div>
 </div>
 
 <div class="step" id="step-1"></div>
@@ -788,38 +788,29 @@ ${[...VERSNELLERS].sort((a,b)=>scores[a]-scores[b]).map(c=>domeinBlock(c,scores,
 // Detail-/berekeningsblok voor het test-/notificatierapport: toont per domein
 // de gekozen antwoorden op de 2 hoofdvragen + de volledige scoreberekening.
 function buildBerekeningTxt(scores){
-  const ANS=['Helemaal niet akkoord','Niet akkoord','Akkoord','Volledig akkoord'];
-  const r2=x=>Math.round(x*100)/100;
+  const nl=x=>(Math.round(x*100)/100).toString().replace('.',',');
   const main={},side={};
   Object.keys(DOMAINS).forEach(d=>{main[d]=[];side[d]=[];});
   VRAGEN.forEach((v,i)=>{
     if(!scoreVals[i])return;
-    main[v.h].push(i);
-    (v.n||[]).forEach(d=>{if(side[d])side[d].push(i);});
+    main[v.h].push(scoreVals[i]);
+    (v.n||[]).forEach(d=>{if(side[d])side[d].push(scoreVals[i]);});
   });
-  let out='===== DETAIL & BEREKENING =====\n';
-  out+='Antwoord 1-4 (1=Helemaal niet akkoord ... 4=Volledig akkoord). "telt als" = na omkering bij omgekeerde vragen (4=positief).\n';
-  out+='Formule: Hoofd = (2x laagste + hoogste)/3 ; Eind = 0.8x Hoofd + 0.2x gem(neven). Zone: <2.2 kritisch / <3.0 aandacht / <3.6 goed / >=3.6 troef.\n';
+  let out='===== BEREKENING PER DOMEIN =====\n';
+  out+='Score = 0,8 × (2×laagste + hoogste)/3  +  0,2 × (som neven)/aantal. Antwoord telt: Helemaal niet akkoord=4 / Niet akkoord=3 / Akkoord=2 / Volledig akkoord=1.\n';
+  out+='Zone: <2,2 kritisch / <3,0 aandacht / <3,6 goed / >=3,6 troef.\n';
   [...LIJNEN,...VERSNELLERS].forEach(d=>{
-    const mIdx=main[d];
-    out+='\n=== '+DOMAINS[d]+' = '+scores[d]+'/4 ('+getProfiel(d,getZone(scores[d])).lbl+') ===\n';
-    if(!mIdx.length){out+='(geen antwoorden)\n';return;}
-    mIdx.forEach(i=>{
-      const v=VRAGEN[i],raw=rawAns[i];
-      out+='• V'+(i+1)+(v.inv?' (omgekeerd)':'')+': "'+v.t+'" => '+(raw?ANS[raw-1]+' (telt als '+scoreVals[i]+')':'NIET INGEVULD')+'\n';
-    });
-    const mVals=mIdx.map(i=>scoreVals[i]);
-    const lo=Math.min(...mVals),hi=Math.max(...mVals),hoofd=(2*lo+hi)/3;
-    out+='Hoofd = (2x'+lo+' + '+hi+')/3 = '+r2(hoofd)+'\n';
-    const sIdx=side[d];
-    if(sIdx.length){
-      const sVals=sIdx.map(i=>scoreVals[i]);
-      const savg=sVals.reduce((a,b)=>a+b,0)/sVals.length;
-      out+='Neven ('+sIdx.map(i=>'V'+(i+1)+'='+scoreVals[i]).join(', ')+') gem = '+r2(savg)+'\n';
-      out+='Eind = 0.8x'+r2(hoofd)+' + 0.2x'+r2(savg)+' = '+scores[d]+'\n';
+    const m=main[d];
+    if(!m.length){out+=DOMAINS[d]+': (geen antwoorden)\n';return;}
+    const lo=Math.min(...m),hi=Math.max(...m),s=side[d],z=getZone(scores[d]);
+    let line=DOMAINS[d]+' = ';
+    if(s.length){
+      line+='0,8×(2×'+lo+'+'+hi+')/3 + 0,2×('+s.join('+')+')/'+s.length;
     }else{
-      out+='Geen nevendomein -> Eind = '+r2(hoofd)+' = '+scores[d]+'\n';
+      line+='(2×'+lo+'+'+hi+')/3';
     }
+    line+=' = '+nl(scores[d])+'  (z'+z+')';
+    out+=line+'\n';
   });
   return out;
 }

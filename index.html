@@ -341,7 +341,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <button class="btn btn-primary" onclick="startScan()">Start de Quick Scan &rarr;</button>
     </div>
   </div>
-  <div style="text-align:center;font-size:10px;color:var(--muted);opacity:.5;margin-top:10px;letter-spacing:.3px">&copy; The Next Level &middot; v2.10</div>
+  <div style="text-align:center;font-size:10px;color:var(--muted);opacity:.5;margin-top:10px;letter-spacing:.3px">&copy; The Next Level &middot; v2.11</div>
 </div>
 
 <div class="step" id="step-1"></div>
@@ -612,7 +612,10 @@ function buildRapport(){
   const sterk=Object.keys(scores).sort((a,b)=>scores[b]-scores[a]).slice(0,2);
   const gem=Math.round(Object.values(scores).reduce((a,b)=>a+b,0)/Object.values(scores).length*10)/10;
   const gz=getZone(gem);
-  try{stuurNotificatie(naam,bedrijf,document.getElementById('f-email').value.trim(),functie,mw,sector,scores,gem,gz);}catch(e){console.log('Mail fout:',e);}
+  const email=document.getElementById('f-email').value.trim();
+  const tel=document.getElementById('f-tel')?document.getElementById('f-tel').value.trim():'';
+  try{stuurNotificatie(naam,bedrijf,email,functie,mw,sector,scores,gem,gz);}catch(e){console.log('Mail fout:',e);}
+  try{bewaarInDatabase(naam,bedrijf,email,functie,mw,sector,tel,scores,gem);}catch(e){console.log('DB fout:',e);}
 
   const gt=gz<=2
     ?"Uw organisatie beschikt over duidelijke ambitie en vakkennis, maar de interne structuur heeft op meerdere vlakken groeikansen. Uw antwoorden suggereren dat de werking op verschillende domeinen nog te veel via individuen en ad hoc-beslissingen verloopt. Dat is een herkenbaar patroon bij groeibedrijven, en het is oplosbaar. Met de juiste prioriteiten en een pragmatische aanpak is er op korte termijn veel winst te boeken in rendement, rust en schaalbaarheid."
@@ -784,6 +787,33 @@ ${[...VERSNELLERS].sort((a,b)=>scores[a]-scores[b]).map(c=>domeinBlock(c,scores,
     emailjs.init({publicKey:"PcB6qndxr2wKF3d-w"});
   }
 })();
+
+// ── Rechtstreeks wegschrijven naar de offerte-database (naast de mail) ──
+// Roept de beveiligde DB-functie registreer_quickscan aan: upsert bedrijfsdossier
+// + insert scan-rij (ruwe antwoorden + berekende scores). De invuller merkt niets.
+const SB_URL='https://sphmxlfpzzowsekzjltd.supabase.co';
+const SB_KEY='sb_publishable_5-6NPQpNMh3pIhmDysO2Ug_6URRIwCc';
+function bewaarInDatabase(naam,bedrijf,email,functie,mw,sector,tel,scores,gem){
+  if(window._dbBewaardGestuurd) return;   // maar 1× per scan
+  window._dbBewaardGestuurd=true;
+  const labels={};
+  Object.keys(DOMAINS).forEach(d=>{ labels[d]=getProfiel(d,getZone(scores[d])).lbl; });
+  const antwoorden={};                    // ruwe antwoorden per vraag = bron van waarheid
+  rawAns.forEach((r,i)=>{ if(r) antwoorden[i]=r; });
+  const payload={
+    bedrijf:bedrijf, invuller:naam, email:email,
+    invuller_email:email, invuller_functie:functie,
+    sector:sector, medewerkers:mw, telefoon:tel,
+    gemiddelde:gem, scores:scores, labels:labels, antwoorden:antwoorden
+  };
+  fetch(SB_URL+'/rest/v1/rpc/registreer_quickscan',{
+    method:'POST',
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},
+    body:JSON.stringify({payload:payload})
+  }).then(function(r){return r.json();})
+    .then(function(d){ console.log('✔ In database bewaard:',d); })
+    .catch(function(e){ console.log('DB-schrijven mislukt (mail blijft vangnet):',e); });
+}
 
 // Detail-/berekeningsblok voor het test-/notificatierapport: toont per domein
 // de gekozen antwoorden op de 2 hoofdvragen + de volledige scoreberekening.

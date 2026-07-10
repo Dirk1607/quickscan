@@ -341,7 +341,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <button class="btn btn-primary" onclick="startScan()">Start de Quick Scan &rarr;</button>
     </div>
   </div>
-  <div style="text-align:center;font-size:10px;color:var(--muted);opacity:.5;margin-top:10px;letter-spacing:.3px">&copy; The Next Level &middot; v2.11</div>
+  <div style="text-align:center;font-size:10px;color:var(--muted);opacity:.5;margin-top:10px;letter-spacing:.3px">&copy; The Next Level &middot; v2.12</div>
 </div>
 
 <div class="step" id="step-1"></div>
@@ -800,11 +800,14 @@ function bewaarInDatabase(naam,bedrijf,email,functie,mw,sector,tel,scores,gem){
   Object.keys(DOMAINS).forEach(d=>{ labels[d]=getProfiel(d,getZone(scores[d])).lbl; });
   const antwoorden={};                    // ruwe antwoorden per vraag = bron van waarheid
   rawAns.forEach((r,i)=>{ if(r) antwoorden[i]=r; });
+  // Zelfbeschrijvend: stuur de vragen (domein + neven + tekst) mee, index-gelijk met 'antwoorden'.
+  // Zo blijft de koppeling vraag→lijn/versneller kloppen, ook als deze lijst later wijzigt.
+  const vragen=VRAGEN.map(v=>({h:v.h,n:v.n,t:v.t}));
   const payload={
     bedrijf:bedrijf, invuller:naam, email:email,
     invuller_email:email, invuller_functie:functie,
     sector:sector, medewerkers:mw, telefoon:tel,
-    gemiddelde:gem, scores:scores, labels:labels, antwoorden:antwoorden
+    gemiddelde:gem, scores:scores, labels:labels, antwoorden:antwoorden, vragen:vragen
   };
   fetch(SB_URL+'/rest/v1/rpc/registreer_quickscan',{
     method:'POST',
